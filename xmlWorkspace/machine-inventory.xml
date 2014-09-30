@@ -1,0 +1,796 @@
+<programs>
+<record>
+    <displayname><![CDATA[unity-webapps-googledocs]]></displayname>
+    <displayversion><![CDATA[2.4.16+14.04.20140411-0ubuntu1.1]]></displayversion>
+    <publisher><![CDATA[Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://docs.google.com]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-09-28 11:47:55]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[gksu]]></displayname>
+    <displayversion><![CDATA[2.0.2-6ubuntu2]]></displayversion>
+    <publisher><![CDATA[Gustavo Noronha Silva <kov@debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://www.nongnu.org/gksu]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-09-23 11:54:57]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libgksu2-0]]></displayname>
+    <displayversion><![CDATA[2.0.13~pre1-6ubuntu4]]></displayversion>
+    <publisher><![CDATA[Gustavo Noronha Silva <kov@debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://www.nongnu.org/gksu]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-09-23 11:54:56]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[unity-webapps-youtube]]></displayname>
+    <displayversion><![CDATA[2.4.16+14.04.20140428-0ubuntu1]]></displayversion>
+    <publisher><![CDATA[Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://www.youtube.com]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-09-04 14:05:42]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[grub-customizer]]></displayname>
+    <displayversion><![CDATA[4.0.6-0ubuntu1~ppa1t]]></displayversion>
+    <publisher><![CDATA[Daniel Richter <danielrichter2007@web.de>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://launchpad.net/grub-customizer]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-12 11:26:19]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[git]]></displayname>
+    <displayversion><![CDATA[1:1.9.1-1]]></displayversion>
+    <publisher><![CDATA[Gerrit Pape <pape@smarden.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://git-scm.com/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 12:09:07]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[liberror-perl]]></displayname>
+    <displayversion><![CDATA[0.17-1.1]]></displayversion>
+    <publisher><![CDATA[Clint Burfoot <clint@burfoot.info>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://git-scm.com/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 12:09:06]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[git-man]]></displayname>
+    <displayversion><![CDATA[1:1.9.1-1]]></displayversion>
+    <publisher><![CDATA[Gerrit Pape <pape@smarden.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://git-scm.com/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 12:09:06]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[nmap]]></displayname>
+    <displayversion><![CDATA[6.40-0.2ubuntu1]]></displayversion>
+    <publisher><![CDATA[LaMont Jones <lamont@debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://git-scm.com/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:56:05]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[liblinear-tools]]></displayname>
+    <displayversion><![CDATA[1.8+dfsg-1ubuntu1]]></displayversion>
+    <publisher><![CDATA[Christian Kastner <debian@kvr.at>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://www.csie.ntu.edu.tw/~cjlin/liblinear/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:56:05]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[liblinear1]]></displayname>
+    <displayversion><![CDATA[1.8+dfsg-1ubuntu1]]></displayversion>
+    <publisher><![CDATA[Christian Kastner <debian@kvr.at>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://www.csie.ntu.edu.tw/~cjlin/liblinear/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:56:04]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libblas3]]></displayname>
+    <displayversion><![CDATA[1.2.20110419-7]]></displayversion>
+    <publisher><![CDATA[Debian Science Team <debian-science-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://www.netlib.org/blas/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:56:04]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[arp-scan]]></displayname>
+    <displayversion><![CDATA[1.8.1-2ubuntu1]]></displayversion>
+    <publisher><![CDATA[Tim Brown <timb@nth-dimension.org.uk>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://www.nta-monitor.com/tools/arp-scan/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:06]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libwww-perl]]></displayname>
+    <displayversion><![CDATA[6.05-2]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://metacpan.org/release/libwww-perl/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:05]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[liblwp-protocol-https-perl]]></displayname>
+    <displayversion><![CDATA[6.04-2ubuntu0.1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://metacpan.org/release/LWP-Protocol-https/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:05]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libwww-robotrules-perl]]></displayname>
+    <displayversion><![CDATA[6.01-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/WWW-RobotRules/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:04]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libnet-http-perl]]></displayname>
+    <displayversion><![CDATA[6.06-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://metacpan.org/release/Net-HTTP/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:04]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhttp-negotiate-perl]]></displayname>
+    <displayversion><![CDATA[6.00-2]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/HTTP-Negotiate/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:03]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhttp-daemon-perl]]></displayname>
+    <displayversion><![CDATA[6.01-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/HTTP-Daemon/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:03]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhttp-cookies-perl]]></displayname>
+    <displayversion><![CDATA[6.00-2]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/HTTP-Cookies/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:02]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhtml-format-perl]]></displayname>
+    <displayversion><![CDATA[2.11-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://metacpan.org/release/HTML-Format/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:02]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhtml-tree-perl]]></displayname>
+    <displayversion><![CDATA[5.03-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://metacpan.org/release/HTML-Tree/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:01]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhtml-form-perl]]></displayname>
+    <displayversion><![CDATA[6.03-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/HTML-Form/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:01]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[liblwp-mediatypes-perl]]></displayname>
+    <displayversion><![CDATA[6.02-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/LWP-MediaTypes/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:00]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhttp-message-perl]]></displayname>
+    <displayversion><![CDATA[6.06-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://metacpan.org/release/HTTP-Message/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:54:00]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libio-html-perl]]></displayname>
+    <displayversion><![CDATA[1.00-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/IO-HTML/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:53:59]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhtml-tagset-perl]]></displayname>
+    <displayversion><![CDATA[3.20-2]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/HTML-Tagset/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:53:59]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhtml-parser-perl]]></displayname>
+    <displayversion><![CDATA[3.71-1build1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[https://metacpan.org/release/HTML-Parser/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:53:59]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libfont-afm-perl]]></displayname>
+    <displayversion><![CDATA[1.20-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/Font-AFM/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:53:58]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libhttp-date-perl]]></displayname>
+    <displayversion><![CDATA[6.02-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/HTTP-Date/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:53:57]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libfile-listing-perl]]></displayname>
+    <displayversion><![CDATA[6.04-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/File-Listing/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:53:57]]></installdate>
+    <installlocation></installlocation>
+</record>
+<record>
+    <displayname><![CDATA[libencode-locale-perl]]></displayname>
+    <displayversion><![CDATA[1.03-1]]></displayversion>
+    <publisher><![CDATA[Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>]]></publisher>
+    <contact></contact>
+    <urlinfoabout><![CDATA[http://search.cpan.org/dist/Encode-Locale/]]></urlinfoabout>
+    <comments></comments>
+    <installdate><![CDATA[2014-08-05 11:53:56]]></installdate>
+    <installlocation></installlocation>
+</record>
+</programs>
+<hwinventory>
+<record>
+    <node>1</node>
+    <item><![CDATA[Motherboard]]></item>
+    <attribute><![CDATA[Manufacturer]]></attribute>
+    <value><![CDATA[ASUSTeK Computer INC.]]></value>
+</record>
+<record>
+    <node>1</node>
+    <item><![CDATA[Motherboard]]></item>
+    <attribute><![CDATA[Model]]></attribute>
+    <value><![CDATA[To be filled by O.E.M.]]></value>
+</record>
+<record>
+    <node>1</node>
+    <item><![CDATA[Motherboard]]></item>
+    <attribute><![CDATA[Part Number]]></attribute>
+    <value><![CDATA[NULL]]></value>
+</record>
+<record>
+    <node>1</node>
+    <item><![CDATA[Motherboard]]></item>
+    <attribute><![CDATA[Serial Number]]></attribute>
+    <value><![CDATA[MS1C83R60807785]]></value>
+</record>
+<record>
+    <node>1</node>
+    <item><![CDATA[Motherboard]]></item>
+    <attribute><![CDATA[BIOS]]></attribute>
+    <value><![CDATA[5.23]]></value>
+</record>
+<record>
+    <node>1</node>
+    <item><![CDATA[Display Adapter]]></item>
+    <attribute><![CDATA[Model]]></attribute>
+    <value><![CDATA[Intel Corporation 82G33/G31 Express Integrated Graphics Controller (rev 02)]]></value>
+</record>
+<record>
+    <node>1</node>
+    <item><![CDATA[Enclosure]]></item>
+    <attribute><![CDATA[Chassis]]></attribute>
+    <value><![CDATA[3]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Manufacturer]]></attribute>
+    <value><![CDATA[Ubuntu]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Type]]></attribute>
+    <value><![CDATA[trusty]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Version]]></attribute>
+    <value><![CDATA[14.04]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Service Pack]]></attribute>
+    <value><![CDATA[NULL]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Install Date]]></attribute>
+    <value><![CDATA[2014-07-08 18:06]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Architecture]]></attribute>
+    <value><![CDATA[x86_64]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Role]]></attribute>
+    <value><![CDATA[NULL]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Description]]></attribute>
+    <value><![CDATA[Ubuntu 14.04 LTS]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item><![CDATA[CPU0]]></item>
+    <attribute><![CDATA[Manufacturer]]></attribute>
+    <value><![CDATA[GenuineIntel]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item><![CDATA[CPU0]]></item>
+    <attribute><![CDATA[Version]]></attribute>
+    <value><![CDATA[15]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item><![CDATA[CPU0]]></item>
+    <attribute><![CDATA[Name]]></attribute>
+    <value><![CDATA[Intel(R) Pentium(R) Dual  CPU  E2160  @ 1.80GHz]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item><![CDATA[CPU0]]></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[1200.000]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item><![CDATA[CPU1]]></item>
+    <attribute><![CDATA[Manufacturer]]></attribute>
+    <value><![CDATA[GenuineIntel]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item><![CDATA[CPU1]]></item>
+    <attribute><![CDATA[Version]]></attribute>
+    <value><![CDATA[15]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item><![CDATA[CPU1]]></item>
+    <attribute><![CDATA[Name]]></attribute>
+    <value><![CDATA[Intel(R) Pentium(R) Dual  CPU  E2160  @ 1.80GHz]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item><![CDATA[CPU1]]></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[1800.000]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM0]]></item>
+    <attribute><![CDATA[Size]]></attribute>
+    <value><![CDATA[1073741824]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM0]]></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[667 MHz]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM0]]></item>
+    <attribute><![CDATA[Form Factor]]></attribute>
+    <value><![CDATA[DIMM]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM0]]></item>
+    <attribute><![CDATA[Bank Label]]></attribute>
+    <value><![CDATA[BANK0]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM1]]></item>
+    <attribute><![CDATA[Size]]></attribute>
+    <value><![CDATA[1073741824]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM1]]></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[667 MHz]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM1]]></item>
+    <attribute><![CDATA[Form Factor]]></attribute>
+    <value><![CDATA[DIMM]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM1]]></item>
+    <attribute><![CDATA[Bank Label]]></attribute>
+    <value><![CDATA[BANK1]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM2]]></item>
+    <attribute><![CDATA[Size]]></attribute>
+    <value><![CDATA[1073741824]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM2]]></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[667 MHz]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM2]]></item>
+    <attribute><![CDATA[Form Factor]]></attribute>
+    <value><![CDATA[DIMM]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM2]]></item>
+    <attribute><![CDATA[Bank Label]]></attribute>
+    <value><![CDATA[BANK2]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM3]]></item>
+    <attribute><![CDATA[Size]]></attribute>
+    <value><![CDATA[1073741824]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM3]]></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[667 MHz]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM3]]></item>
+    <attribute><![CDATA[Form Factor]]></attribute>
+    <value><![CDATA[DIMM]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[DIMM3]]></item>
+    <attribute><![CDATA[Bank Label]]></attribute>
+    <value><![CDATA[BANK3]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[Physical]]></item>
+    <attribute><![CDATA[Free Memory Slots]]></attribute>
+    <value><![CDATA[0]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[Physical]]></item>
+    <attribute><![CDATA[Total]]></attribute>
+    <value><![CDATA[4294967296]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[Visible]]></item>
+    <attribute><![CDATA[Total]]></attribute>
+    <value><![CDATA[4135530496]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[0]]></item>
+    <attribute><![CDATA[Model]]></attribute>
+    <value><![CDATA[Optiarc DVD RW AD-7200S]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[1]]></item>
+    <attribute><![CDATA[Model]]></attribute>
+    <value><![CDATA[Western Digital WDC WD1600AAJS-6]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[1]]></item>
+    <attribute><![CDATA[Interface Type]]></attribute>
+    <value><![CDATA[SCSI]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[1]]></item>
+    <attribute><![CDATA[Size]]></attribute>
+    <value><![CDATA[149GiB (160GB)]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda1]]></item>
+    <attribute><![CDATA[Partition Size (Gib)]]></attribute>
+    <value><![CDATA[1.91552]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda1]]></item>
+    <attribute><![CDATA[Free Space (Gib)]]></attribute>
+    <value><![CDATA[1.91551]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda1]]></item>
+    <attribute><![CDATA[Volume Name]]></attribute>
+    <value><![CDATA[/dev/sda1]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda1]]></item>
+    <attribute><![CDATA[Volume Serial Number]]></attribute>
+    <value><![CDATA[9057-2f25]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda1]]></item>
+    <attribute><![CDATA[File System]]></attribute>
+    <value><![CDATA[Windows NTFS volume]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda2]]></item>
+    <attribute><![CDATA[Partition Size (Gib)]]></attribute>
+    <value><![CDATA[100.123]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda2]]></item>
+    <attribute><![CDATA[Free Space (Gib)]]></attribute>
+    <value><![CDATA[48.7934]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda2]]></item>
+    <attribute><![CDATA[Volume Name]]></attribute>
+    <value><![CDATA[/media/asal/14605CE5605CCF5C]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda2]]></item>
+    <attribute><![CDATA[Volume Serial Number]]></attribute>
+    <value><![CDATA[7abd6952-ac21-9347-a12c-265f8bddcebe]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda2]]></item>
+    <attribute><![CDATA[File System]]></attribute>
+    <value><![CDATA[Windows NTFS volume]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda3]]></item>
+    <attribute><![CDATA[Partition Size (Gib)]]></attribute>
+    <value><![CDATA[1.91552]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda3]]></item>
+    <attribute><![CDATA[Free Space (Gib)]]></attribute>
+    <value><![CDATA[1.91551]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda3]]></item>
+    <attribute><![CDATA[Volume Name]]></attribute>
+    <value><![CDATA[/dev/sda3]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda3]]></item>
+    <attribute><![CDATA[File System]]></attribute>
+    <value><![CDATA[Extended partition]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda5]]></item>
+    <attribute><![CDATA[Partition Size (Gib)]]></attribute>
+    <value><![CDATA[45.828]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda5]]></item>
+    <attribute><![CDATA[Free Space (Gib)]]></attribute>
+    <value><![CDATA[39.8274]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda5]]></item>
+    <attribute><![CDATA[Volume Name]]></attribute>
+    <value><![CDATA[/]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda5]]></item>
+    <attribute><![CDATA[File System]]></attribute>
+    <value><![CDATA[Linux filesystem partition]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda6]]></item>
+    <attribute><![CDATA[Partition Size (Gib)]]></attribute>
+    <value><![CDATA[1.91552]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda6]]></item>
+    <attribute><![CDATA[Free Space (Gib)]]></attribute>
+    <value><![CDATA[1.91551]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda6]]></item>
+    <attribute><![CDATA[Volume Name]]></attribute>
+    <value><![CDATA[/dev/sda6]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[/dev/sda6]]></item>
+    <attribute><![CDATA[File System]]></attribute>
+    <value><![CDATA[Linux swap / Solaris partition]]></value>
+</record>
+<record>
+    <node></node>
+    <item><![CDATA[10]]></item>
+    <attribute><![CDATA[Model]]></attribute>
+    <value><![CDATA[Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller]]></value>
+</record>
+<record>
+    <node></node>
+    <item><![CDATA[10]]></item>
+    <attribute><![CDATA[MAC Address]]></attribute>
+    <value><![CDATA[00:1e:0b:a9:d8:e8]]></value>
+</record>
+<record>
+    <node></node>
+    <item><![CDATA[10]]></item>
+    <attribute><![CDATA[IP Addresses]]></attribute>
+    <value><![CDATA[10.10.140.238|fe80::21e:bff:fea9:d8e8]]></value>
+</record>
+<record>
+    <node></node>
+    <item><![CDATA[10]]></item>
+    <attribute><![CDATA[Default Gateway]]></attribute>
+    <value><![CDATA[10.10.140.1]]></value>
+</record>
+<record>
+    <node></node>
+    <item><![CDATA[10]]></item>
+    <attribute><![CDATA[DNS Domain]]></attribute>
+    <value><![CDATA[asal-testing.asaltech.com asaltech.com]]></value>
+</record>
+<record>
+    <node></node>
+    <item><![CDATA[10]]></item>
+    <attribute><![CDATA[DHCP Server]]></attribute>
+    <value><![CDATA[10.10.140.1
+10.10.140.1]]></value>
+</record>
+<record>
+    <node></node>
+    <item><![CDATA[10]]></item>
+    <attribute><![CDATA[DNS Servers]]></attribute>
+    <value><![CDATA[172.22.1.70|172.22.1.15|]]></value>
+</record>
+</hwinventory>
+<hardware>
+<record>
+    <manufacturer>ASUSTeK Computer INC.</manufacturer>
+    <model>To be filled by O.E.M.</model>
+    <product>2A73h</product>
+    <serialnumber>MS1C83R60807785</serialnumber>
+    <partnumber>NULL</partnumber>
+    <bios>5.23</bios>
+    <os>Linux asal-testing 3.13.0-24-generic #46-Ubuntu SMP Thu Apr 10 19:11:08 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux</os>
+    <processors>Intel(R) Pentium(R) Dual  CPU  E2160  @ 1.80GHz</processors>
+    <physicalmemory>4294967296</physicalmemory>
+    <physicalmemorydet>[DIMM0] 1073741824/667; [DIMM1] 1073741824/667; [DIMM2] 1073741824/667; [DIMM3] 1073741824/667; </physicalmemorydet>
+    <visiblememory>4135530496</visiblememory>
+    <displayadapters>Intel Corporation 82G33/G31 Express Integrated Graphics Controller (rev 02)</displayadapters>
+    <networkadapters>Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller [00:1e:0b:a9:d8:e8][10.10.140.238|fe80::21e:bff:fea9:d8e8/64];</networkadapters>
+    <diskdrives>Western Digital WDC WD1600AAJS-6 [149GiB (160GB) SCSI];</diskdrives>
+    <cdromdrives>Optiarc DVD-RAM writer DVD RW AD-7200S</cdromdrives>
+    <chassis>3</chassis>
+    <domainrole>0</domainrole>
+</record>
+</hardware>

@@ -1,0 +1,141 @@
+#!/bin/bash
+
+
+
+. common-hardware-extraction-functions.lib
+
+# Parent Nodes functions
+function systemNodeEnumerator() {
+  #1
+  node=$systemNodeNumber
+  
+  item="Motherboard"
+  attribute="Manufacturer"
+  value=$(manufacturerNode) 
+  generateHwInventoryXmlRecord
+  
+  item="Motherboard"
+  attribute="Model"
+  value=$(modelNode)
+  generateHwInventoryXmlRecord
+
+  item="Motherboard"
+  attribute="Part Number"
+  value=$(partnumberNode)
+  generateHwInventoryXmlRecord  
+  
+  item="Motherboard"
+  attribute="Serial Number"
+  value=$(serialnumberNode)
+  generateHwInventoryXmlRecord 
+  
+  item="Motherboard"
+  attribute="BIOS"
+  value=$(biosNode)
+  generateHwInventoryXmlRecord
+  
+  item="Display Adapter"
+  attribute="Model"
+  value=$(displayadaptersNode)
+  generateHwInventoryXmlRecord
+  
+  item="Enclosure"
+  attribute="Chassis"
+  value=$(chassisNode)
+  generateHwInventoryXmlRecord
+}
+
+function osNodeEnumerator() {
+  #2
+  node=$osNodeNumber
+
+  item="Operating System"  
+  attribute="Manufacturer"
+  value=$(osManufacturerNode)
+  generateHwInventoryXmlRecord
+  
+  item="Operating System"
+  attribute="Type"
+  value=$(osTypeNode)
+  generateHwInventoryXmlRecord
+  
+  item="Operating System"
+  attribute="Version"
+  value=$(osVersionNode)
+  generateHwInventoryXmlRecord
+  
+  # N/A
+  item="Operating System"
+  attribute="Service Pack"
+  value=$(osServicePackNode)
+  generateHwInventoryXmlRecord
+ 
+  item="Operating System"
+  attribute="Install Date"
+  value=$(osInstallDateNode)
+  generateHwInventoryXmlRecord
+  
+  item="Operating System"
+  attribute="Architecture"
+  value=$(osArchitectureNode)
+  generateHwInventoryXmlRecord
+  
+  item="Operating System"
+  attribute="Role"
+  value=$(osRoleNode)
+  generateHwInventoryXmlRecord
+  
+  # Linux exclusive (no windows match)
+  item="Operating System"
+  attribute="Description"
+  value=$(osDescriptionNode)
+  generateHwInventoryXmlRecord
+}
+
+function cpuNodeEnumerator() {
+  node=$cpuNodeNumber
+  case $OS in
+    Linux)
+      awkScriptMaker ubuntuCpuNodeAwkScript ;;
+    *)	
+      echo "Unsupported OS: $OS" >&2;;
+  esac	
+}
+
+function memoryNodeEnumerator() {
+  node=$memoryNodesNumber
+  case $OS in
+    Linux)
+      awkScriptMaker ubuntuMemoryNodeAwkScript 
+      item="Physical"
+      attribute="Total"
+      value=$(physicalmemoryNode)
+      generateHwInventoryXmlRecord
+      item="Visible"
+      attribute="Total"
+      value=$(visiblememoryNode)
+      generateHwInventoryXmlRecord
+      ;;
+    *)	
+      echo "Unsupported OS: $OS" >&2;;
+  esac	 
+}
+
+function drivesNodeEnumerator() {
+  drivesInfoXml
+}
+
+function networkNodesEnumerator() {
+  node=$networkNodesNumber
+  case $OS in
+    Linux)
+      awkScriptMaker ubuntuNetworkNodesEnumerator
+  	  ;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+
+
+

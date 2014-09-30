@@ -1,0 +1,134 @@
+#!/bin/bash
+# this file's output is a script.
+
+thisScriptName=$(basename ${BASH_SOURCE[0]})
+
+function printXmlRecordsGeneratingScript() {
+  echo "#!/bin/bash"
+  echo ". $thisScriptName"
+
+  case $OS in
+    Linux)
+    	printUbuntuXmlRecordsGeneratingScript;;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+
+function printUbuntuXmlRecordsGeneratingScript() {
+  tmpPkgListFile="._tmp-pkg-list"
+  tmpPkgFile="._tmp-pkg-file"
+  tmpPkgDetailsFile="._tmp-pkg-details-file"
+  echo "" > $tmpPkgFile
+  
+  # 1- append all info from archived logs to tmpPkgFile
+  #i=2
+  #mycount=$(ls -l /var/log/dpkg.log.*.gz | wc -l)
+  #nlogs=$(( $mycount + 1 ))
+
+  #while [ $i -le $nlogs ]
+  #do
+  #if [ -e /var/log/dpkg.log.$i.gz ]; then
+  #zcat /var/log/dpkg.log.$i.gz | grep "\ install\ " >> $tmpPkgFile
+  #fi
+  #i=$(( $i+1 ))
+  #done
+
+  # 2- append all info from unarchived logs to tmpPkgFile
+  i=1
+  nulogs=$(ls -l /var/log/dpkg.log.* | wc -l)
+  nulogs=$(( $nulogs - $nlogs + 1 ))
+  while [ $i -le $nulogs ]
+  do
+  if [ -e /var/log/dpkg.log.$i ]; then
+  cat /var/log/dpkg.log.$i | grep "\ install\ " >> $tmpPkgFile
+  fi
+  i=$(( $i+1 ))
+  done
+
+  # 3- append current log to tmpPkgFile
+  cat /var/log/dpkg.log | grep "\ install\ " >> $tmpPkgFile
+
+  # 4- sort tmpPkgFile (by date reverse order from latest) into tmpPkgListFile
+  sort -n -r $tmpPkgFile > $tmpPkgListFile
+  
+  # 5- find each package's details and store it to tmpPkgDetailsFile
+  cat $tmpPkgListFile | awk -F "[: ]" '{print $6;}' | xargs dpkg --print-avail | 
+  awk -F ": " '
+  /Package/{displayname=$2} 
+  /Version:/{displayversion=$2} 
+  /Maintainer:/{publisher=$2} 
+  /Homepage:/{urlinfoabout=$2} 
+  /Description:/{comments="$2"} 
+  /^$/ {
+    print "displayname=\""displayname"\"; displayversion=\""displayversion"\"; publisher=\""publisher"\"; urlinfoabout=\""urlinfoabout"\"; comments=\""comments"\"; "
+  } 
+  END {
+    print "displayname=\""displayname"\"; displayversion=\""displayversion"\"; publisher=\""publisher"\"; urlinfoabout=\""urlinfoabout"\"; comments=\""comments"\"; "
+  }' > $tmpPkgDetailsFile
+
+  # parse & print info from tmp files: tmpPkgListFile & tmpPkgDetailsFile
+  awk -F "[: ]" '
+  BEGIN{OFS=":"}
+  (FNR==1){file_num+=1} 
+  (file_num==1) && !/^$/{myarr[FNR]=$1" "$2":"$3":"$4;} 
+  (file_num==2){ print "installdate=\""myarr[FNR]"\"; "$0" generateProgramsXmlRecord;"}' $tmpPkgListFile $tmpPkgDetailsFile 
+}
+
+
+
+#---------------------Programs Node XML Record Formatter-----------------------#
+function generateProgramsXmlRecord() {
+
+if [[ ! -z $displayname && ${displayname+x} ]]
+then
+  displayname="<![CDATA[$displayname]]>"
+fi
+
+if [[ ! -z $displayversion && ${displayversion+x} ]]
+then
+  displayversion="<![CDATA[$displayversion]]>"
+fi
+
+if [[ ! -z $publisher && ${publisher+x} ]]
+then
+  publisher="<![CDATA[$publisher]]>"
+fi
+
+if [[ ! -z $contact && ${contact+x} ]]
+then
+  contact="<![CDATA[$contact]]>"
+fi
+
+if [[ ! -z $urlinfoabout && ${urlinfoabout+x} ]]
+then
+  urlinfoabout="<![CDATA[$urlinfoabout]]>"
+fi
+
+if [[ ! -z $comments && ${comments+x} ]]
+then
+  comments="<![CDATA[$comments]]>"
+fi
+
+if [[ ! -z $installdate && ${installdate+x} ]]
+then
+  installdate="<![CDATA[$installdate]]>"
+fi
+
+if [[ ! -z $installlocation && ${installlocation+x} ]]
+then
+  installlocation="<![CDATA[$installlocation]]>"
+fi
+
+echo -e "<record>
+    <displayname>$displayname</displayname>
+    <displayversion>$displayversion</displayversion>
+    <publisher>$publisher</publisher>
+    <contact>$contact</contact>
+    <urlinfoabout>$urlinfoabout</urlinfoabout>
+    <comments>$comments</comments>
+    <installdate>$installdate</installdate>
+    <installlocation>$installlocation</installlocation>
+</record>" 
+}

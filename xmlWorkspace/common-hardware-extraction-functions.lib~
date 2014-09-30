@@ -1,0 +1,559 @@
+#!/bin/bash
+
+hardwareInfo="._hardware.info"
+OEMMsg="To be filled by O.E.M."
+nullMsg="NULL"
+
+# Ubuntu Initialization steps: store lshw output in file for later access
+function Init() {
+  case $OS in
+    Linux)
+    	sudo lshw > $hardwareInfo;;
+    	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+#TODO: recall this after development is done
+if [[ -z  $DEVELOPER  ]]
+then
+  Init
+fi
+
+#-------------------------------Hw Inventory Functions-------------------------------#
+
+#-------------------Hw Inventory Node XML Record Formatter---------------------#
+thisScriptName=$(basename ${BASH_SOURCE[0]})
+# This function will not echo anything if the value is empty
+function generateHwInventoryXmlRecord() {
+
+if [[ ! -z $item && ${item+x} ]]
+then
+  item="<![CDATA[$item]]>"
+fi
+
+if [[ ! -z $attribute && ${attribute+x} ]]
+then
+  attribute="<![CDATA[$attribute]]>"
+fi
+
+if [[ ! -z $value && ${value+x} ]]
+then
+  value="<![CDATA[$value]]>"
+else
+  return
+fi
+
+echo -e "<record>
+    <node>$node</node>
+    <item>$item</item>
+    <attribute>$attribute</attribute>
+    <value>$value</value>
+</record>"
+}
+
+function ubuntuCpuNodeAwkScript() {
+  echo "node=$cpuNodeNumber"
+  cat /proc/cpuinfo|     
+    awk -F ": " '
+    /processor/{
+    procId="CPU"$2
+    }
+    /vendor_id/{ 
+      print "item=\""procId"\" attribute=\"Manufacturer\" value=\""$2"\" generateHwInventoryXmlRecord; ";     
+    }
+    /model/{
+      if ( $1 ~ "model name" ) {
+        print "item=\""procId"\" attribute=\"Name\" value=\""$2"\" generateHwInventoryXmlRecord; "
+      } else {
+        print "item=\""procId"\" attribute=\"Version\" value=\""$2"\" generateHwInventoryXmlRecord; "; 
+      }
+    }
+    /cpu MHz/{
+      print "item=\""procId"\" attribute=\"Speed\" value=\""$2"\" generateHwInventoryXmlRecord; "
+    }
+    '
+}
+
+function ubuntuMemoryNodeAwkScript() {
+  echo "node=$memoryNodesNumber"
+  sudo dmidecode memory | 
+    awk -F ": " '
+    BEGIN{ OFMT = "%.0f"; found=0;mSize=0; freeSlots=0} 
+    /Size/{mSize=$2*1024*1024;} 
+    /Speed/{mSpeed=$2;}
+    /Form Factor/{mFormFactor=$2;found++;}
+    /Locator/{ 
+      if ( $1 ~ /Bank Locator/ ) {
+        mBank=$2;
+      } else {
+        dimId=$2;
+      }
+    }
+    /^$/ {   
+      if (found > 0) {
+        if (mSize+0 == 0){ freeSlots++}
+        found = 0;
+        print "item=\""dimId"\" attribute=\"Size\" value=\""mSize"\" generateHwInventoryXmlRecord; ";
+        print "item=\""dimId"\" attribute=\"Speed\" value=\""mSpeed"\" generateHwInventoryXmlRecord; ";
+        print "item=\""dimId"\" attribute=\"Form Factor\" value=\""mFormFactor"\" generateHwInventoryXmlRecord; ";
+        print "item=\""dimId"\" attribute=\"Bank Label\" value=\""mBank"\" generateHwInventoryXmlRecord; ";
+      } 
+    }
+    END{ print "item=\"Physical\" attribute=\"Free Memory Slots\" value=\""freeSlots"\" generateHwInventoryXmlRecord; "; }
+    '
+}
+
+function ubuntuDrivesNodeEnumerator() {
+  echo "node=$drivesNodeNumber"
+    
+  cat $hardwareInfo | 
+  awk -F ": " '
+  BEGIN{
+  nodesFound=0;
+  diskNum=0;
+  nodeType=0;
+  found=0;
+  iType="SCSI";
+  
+  }
+  function printCdRomInfo() {
+    print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; "; 
+    vendor=""; product="";
+    diskNum++;
+  }
+  function printDiskInfo() {
+    print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
+    print "item=\""diskNum"\" attribute=\"Interface Type\" value=\""iType"\" generateHwInventoryXmlRecord; ";
+    print "item=\""diskNum"\" attribute=\"Size\" value=\""size"\" generateHwInventoryXmlRecord; ";
+    vendor=""; product="";size="";name="";
+    diskNum++;
+  }
+  function printOtherInfo() {
+    
+    freeSpace="`sudo df -k -P "name" | awk '"'"'NR==2{print $4/(1024*1024)}'"'"'`";
+    size="`sudo df -k -P "name" | awk '"'"'NR==2{print $2/(1024*1024)}'"'"'`";
+    
+    print "item=\""name"\" attribute=\"Partition Size (Gib)\" value=\""size"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Free Space (Gib)\" value=\""freeSpace"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Volume Name\" value=\""logicalName"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Volume Serial Number\" value=\""serial"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"File System\" value=\""description"\" generateHwInventoryXmlRecord; ";
+    size = ""; freeSpace="";capacity= "";
+    name="";serial="";description="";logicalName="";
+    diskNum++;
+  }
+  
+  function printPrevious() {
+    if (nodesFound > 0) {
+      #print nodeType;
+      if (nodeType == 0) {
+        printOtherInfo();
+      }
+      if (nodeType == 1) {
+        printCdRomInfo();
+      } 
+      if (nodeType == 2) {
+        printDiskInfo();
+      }
+    }
+  }
+  
+  /\*-scsi/{ found=1;}
+  (found == 0){ next; }
+  
+  
+  /description:/{description=$2} 
+  /product:/{product=$2}
+  /vendor:/{vendor=$2} 
+  /bus info:/{bus=$2} 
+  /logical name:/{ if (name == "") {name=$2 } logicalName=$2;}
+  /serial:/{serial=$2} 
+  /size:/{size=$2} 
+  /capacity:/{capacity=$2} 
+  /\*-/{ 
+    printPrevious();
+    nodesFound++;
+    nodeType=0;
+  }
+  /\*-cdrom/{ nodeType=1;}
+  /\*-disk/{ nodeType=2;}
+  /\*-scsi/{nodeType=-1}
+  END{
+    printPrevious();
+  }  
+  '
+}
+
+function ubuntuNetworkNodesEnumerator() {
+ 
+  dhcpFile="dhcp_file_notfound"
+  if [ -f "/var/lib/dhcp3/dhclient.leases" ] 
+  then
+     dhcpFile="/var/lib/dhcp3/dhclient.leases"
+  fi
+  if [ -f "/var/lib/dhcp/dhclient.leases" ]
+  then
+     dhcpFile="/var/lib/dhcp/dhclient.leases"
+  fi
+
+  echo "node=$networkNodeNumber"
+  cat $hardwareInfo | 
+    awk -F ": " -vdhcpFile="$dhcpFile" '
+    BEGIN{found=0; interfaceNum=10} 
+    /\*-/{ if (found>0) {
+      
+      gateway="`ip -4 route list dev "logicalName" exact 0/0 | awk '"'"'{print $3}'"'"'`";
+      dnsDomain="`uname -n`.`cat \""dhcpFile"\" | awk -F\"[ ;]\" -vname="logicalName" '"'"'/interface/{found=0; if ( $0 ~ name) { found=1}} (found ==1) &&/domain-name /{print $5}'"'"' | xargs echo`";
+      dns="`nm-tool | awk -vname="logicalName" '"'"'BEGIN{ORS=\"|\";}/Device/{found=0; if ( $0 ~ name){ found=1} } (found ==1) && /DNS:/{print $2}'"'"'`";
+      dhcp="`cat \""dhcpFile"\" | awk -F\"[ ;]\" -vname="logicalName" '"'"'/interface/{found=0; if ( $0 ~ name) { found=1}} (found ==1) &&/dhcp-server-identifier/{print $5}'"'"'`";
+      
+      
+      print "item=\""interfaceNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"MAC Address\" value=\""serial"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"IP Addresses\" value=\""ipFour"|"ipSix"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"Default Gateway\" value=\""gateway"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"DNS Domain\" value=\""dnsDomain"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"DHCP Server\" value=\""dhcp"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"DNS Servers\" value=\""dns"\" generateHwInventoryXmlRecord; ";
+      
+      found = 0;
+      vendor=""; product=""; ipFour=""; ipSix=""; serial="";
+      interfaceNum++;
+    }}  
+    /-network/{found=NR;}
+    (found == 0)  { next;}
+    /vendor/ {vendor=$2} 
+    /logical name:/{logicalName=$2}
+    /product/{product=$2} 
+    /serial:/{
+    serial=$2; cmd1="sudo ifconfig | grep -i "$2" -A3 | awk '"'"' /inet6/{split($3,params, \"/\"); print params[1]}'"'"'";cmd1 | getline ipSix} 
+    /configuration:/{
+    configs=$2; cmd="echo " configs " | awk -F '"'[= ]'"' '"'"'{ print $12 }'"'"' "; cmd | getline ipFour
+    }'
+    
+}
+
+
+function osManufacturerNode() {
+  case $OS in
+    Linux)
+    	 lsb_release -i -s;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+function osTypeNode() {
+  case $OS in
+    Linux)
+    	 lsb_release -c -s;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+function osVersionNode() {
+  case $OS in
+    Linux)
+    	 lsb_release -r -s;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+function osDescriptionNode() {
+  case $OS in
+    Linux)
+    	 lsb_release -d -s;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function osInstallDateNode() {
+case $OS in
+    Linux)
+    	 ls -ltc /var/log/installer --time-style=long-iso | awk 'NR==2{print$(NF-2)" "$(NF-1)}';;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function osArchitectureNode() {
+uname -i
+}
+
+
+function osServicePackNode() {
+echo "$nullMsg";
+}
+
+function osRoleNode() {
+echo "$nullMsg";
+}
+
+function physicalmemoryNode() {
+  case $OS in
+    Linux)
+    	 sudo dmidecode memory | awk -v "found=0" 'BEGIN{ OFMT = "%.0f"; mSize=0; totalSize=0} /Size/{mSize=$2*1024*1024;} /DIMM[0-9]/{ found=NR ; totalSize+=mSize} END{print totalSize}'
+;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+
+
+
+
+#-------------------------------Common Functions-------------------------------#
+
+function manufacturerNode() {
+  case $OS in
+    Linux)
+    	sudo dmidecode -t 2 | awk -F ": " '(NR == 6){ print $2 }';;
+    	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function modelNode() {
+  case $OS in
+    *)		
+      echo "$OEMMsg"
+    ;;
+  esac
+}
+function partnumberNode() {
+case $OS in
+    *)		
+      echo "$nullMsg"
+    ;;
+  esac
+}
+function serialnumberNode() {
+  case $OS in
+    Linux)
+    	sudo dmidecode -t 2 | awk -F ": " '(NR == 9){ print $2 }';;
+    	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function biosNode() {
+  case $OS in
+    Linux)
+    	sudo dmidecode -t 0 |
+        awk -F ": " '(NR == 7){ print $2 }' | tr -d ' ';;
+    	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function displayadaptersNode() {
+  case $OS in
+    Linux)
+    	 sudo lspci | awk -F ": " '/VGA/{ print $2}';;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function chassisNode() {
+  case $OS in
+    Linux)
+    	 chasisTypes "$(sudo dmidecode -t 3 | awk -F ": " '/Type:/{print $2}')";;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function physicalmemoryNode() {
+  case $OS in
+    Linux)
+    	 sudo dmidecode memory | awk -v "found=0" 'BEGIN{ OFMT = "%.0f"; mSize=0; totalSize=0} /Size/{mSize=$2*1024*1024;} /DIMM[0-9]/{ found=NR ; totalSize+=mSize} END{print totalSize}'
+;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+
+function visiblememoryNode() {
+  case $OS in
+    Linux)
+    	 free | awk 'BEGIN{ OFMT = "%.0f"; }/Mem/{print $2*1024}';;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function drivesInfoXml() {
+  node=$drivesNodeNumber
+  case $OS in
+    Linux)
+    awkScriptMaker ubuntuDrivesNodeEnumerator
+    ;;
+    *)	
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+
+
+#-------------------------------Hardware Node Functions-------------------------------#
+function productNode() {
+  case $OS in
+    Linux)
+    	sudo dmidecode -t 2 | awk -F ": " '(NR == 7){ print $2 }';;
+    	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function osNode() {
+  case $OS in
+    Linux)
+    	uname -a;;
+    	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function processorsNode() {
+  
+  case $OS in
+    Linux)
+    	cat /proc/cpuinfo|
+        awk -F ": " '/model name/{ print $2}'| head -n 1;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+
+function physicalmemorydetNode() {
+  case $OS in
+    Linux)
+    	 sudo dmidecode memory | awk -v "found=0" 'BEGIN{ OFMT = "%.0f"; mSize=0; dimNum=0; ORS="; "} /Size/{mSize=$2;} /DIMM[0-9]/{ found=NR ;} (found !=0) && (NR == found ){ dimNum=$2 } (found!=0) && (NR == found + 4){ print "["dimNum"] " mSize*1024*1024"/"$2}';;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+  
+}
+function diskdrivesNode() {
+drivesInfoXml |  awk -F "[\[\]]" '(value == "Model"){model=$3;} (value == "Interface Type"){iType=$3;}  (value == "Size"){size=$3} {value=$3;} (model != "") && (iType != "") &&(size != "")  {print model" ["size" "iType"];"; model=""; iType=""; size="";} '
+
+}
+function networkadaptersNode() {
+  case $OS in
+    Linux)
+      cat $hardwareInfo | 
+        awk -F ": " '
+        BEGIN{found=0; } 
+        /\*-/{ if (found>0) {
+          print vendor" "product" ["serial"]["ipFour"|"ipSix"];";
+          found = 0;
+        }}  
+        /-network/{found=NR;}
+        (found == 0)  { next;}
+        /vendor/ {vendor=$2} 
+        /product/{product=$2} 
+        /serial:/{
+        serial=$2; cmd1="sudo ifconfig | grep -i "$2" -A3 | awk '"'"' /inet6/{print $3}'"'"'";cmd1 | getline ipSix} 
+        /configuration:/{
+        configs=$2; cmd="echo " configs " | awk -F '"'[= ]'"' '"'"'{ print $12 }'"'"' "; cmd | getline ipFour
+        }'
+  	  ;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+function cdromdrivesNode() {
+  case $OS in
+    Linux)
+    	  sudo cat $hardwareInfo | awk -F ": " '/\*-/{found=0} /\*-cdrom/{found=1} (found == 1) {print $0} ' | awk -F ": " '/description/{description=$2} /product/{product=$2}/vendor/{vendor=$2} END{print vendor" "description" "product}';;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+#TODO: now we print only 0 as linux Operating systems do not have this property
+function domainroleNode() {
+  case $OS in
+    Linux)
+    	 echo 0;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+
+#------------------------------Auxiliary Functions-----------------------------#
+
+function awkScriptMaker() {
+
+  tmpAwkOutputScript="._tmp-awk-output.sh"
+  executePassedAwk $1 > $tmpAwkOutputScript
+  sudo chmod +x $tmpAwkOutputScript  
+  ./$tmpAwkOutputScript
+}
+
+function executePassedAwk() {
+  echo "#!/bin/bash"
+  echo ". $thisScriptName"
+  $1
+}
+
+function chasisTypes() {
+case $1 in
+    Other)
+    	 echo 1;;	
+    Unknown)
+    	 echo 2;;
+    Desktop)
+    	 echo 3;;
+    "Low Profile Desktop")
+    	 echo 4;;
+    "Pizza Box")
+    	 echo 5;;
+    "Mini Tower")
+    	 echo 6;;
+    Tower)
+    	 echo 7;;
+    Portable)
+    	 echo 8;;
+    Laptop)
+    	 echo 9;;
+    Notebook)
+    	 echo 10;;
+    "Hand Held")
+    	 echo 11;;
+    "Docking Station")
+    	 echo 12;;
+    "All in One")
+    	 echo 13;;
+    "Sub Notebook")
+    	 echo 14;;
+    "Space-Saving")
+    	 echo 15;;
+    "Lunch Box")
+    	 echo 16;;
+    "Main System Chassis")
+    	 echo 17;;
+    "Expansion Chassis")
+    	 echo 18;;
+    "Sub Chassis")
+    	 echo 19;;
+    "Bus Expansion Chassis")
+    	 echo 20;;
+    "Peripheral Chassis")
+    	 echo 21;;
+    "Storage Chassis")
+    	 echo 22;;
+    "Rack Mount Chassis")
+    	 echo 23;;
+    "Sealed-Case PC")
+    	 echo 24;;
+    *)		
+      echo -1 
+      echo "Unsupported Chassis type: $1" >&2;;
+esac
+}
+
+
+

@@ -1,0 +1,44 @@
+#!/bin/bash
+# Each nod we fill in xmls is OS dependent, hence we put each command we use 
+# in a function so that we could add each OS's relevant command
+# 
+# Example to add multi OS command:
+# function osDependentFunction() {
+#  OS=`uname`
+#  case $OS in
+#    Linux)
+#     echo "called from Linux OS";;
+#    Darwin)
+#     echo "called from Linux Mac OS";;	
+#    *)		
+#      echo "Unsupported OS: $OS" >&2;;
+#  esac 
+# 
+. common-hardware-extraction-functions.lib
+
+#--------------------Hardware Node XML Record Formatter------------------------#
+function generateHardwareXmlRecord() {
+  
+ echo -e "<record>
+    <manufacturer>$manufacturer</manufacturer>
+    <model>$model</model>
+    <product>$product</product>
+    <serialnumber>$serialnumber</serialnumber>
+    <partnumber>$partnumber</partnumber>
+    <bios>$bios</bios>
+    <os>$os</os>
+    <processors>$processors</processors>
+    <physicalmemory>$physicalmemory</physicalmemory>
+    <physicalmemorydet>$physicalmemorydet</physicalmemorydet>
+    <visiblememory>$visiblememory</visiblememory>
+    <displayadapters>$displayadapters</displayadapters>
+    <networkadapters>$networkadapters</networkadapters>
+    <diskdrives>$diskdrives</diskdrives>
+    <cdromdrives>$cdromdrives</cdromdrives>
+    <chassis>$chassis</chassis>
+    <domainrole>$domainrole</domainrole>
+</record>"
+}
+  
+
+
