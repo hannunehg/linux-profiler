@@ -27,12 +27,6 @@ function hardwareNodeEnumerator() {
 
 function hwInventoryNodeEnumerator() {
   . hw-inventory-node-enumerator.lib
-  systemNodeNumber=1
-  osNodeNumber=2
-  cpuNodeNumber=3
-  drivesNodeNumber=5
-  memoryNodesNumber=4
-  networkNodesNumber=6
   
   systemNodeEnumerator
   osNodeEnumerator  

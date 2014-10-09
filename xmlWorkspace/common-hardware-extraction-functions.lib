@@ -4,6 +4,14 @@ hardwareInfo="._hardware.info"
 OEMMsg="To be filled by O.E.M."
 nullMsg="NULL"
 
+  systemNodeNumber=1
+  osNodeNumber=2
+  cpuNodeNumber=3
+  drivesNodeNumber=5
+  memoryNodesNumber=4
+  networkNodesNumber=6
+
+
 # Ubuntu Initialization steps: store lshw output in file for later access
 function Init() {
   case $OS in
@@ -81,9 +89,9 @@ function ubuntuMemoryNodeAwkScript() {
   sudo dmidecode memory | 
     awk -F ": " '
     BEGIN{ OFMT = "%.0f"; found=0;mSize=0; freeSlots=0} 
-    /Size/{mSize=$2*1024*1024;} 
+    /Size: [0-9]/{mSize=$2*1024*1024;} 
     /Speed/{mSpeed=$2;}
-    /Form Factor/{mFormFactor=$2;found++;}
+    /Form Factor/{mFormFactor=$2;if (mSize != 0 ) {found=1; }}
     /Locator/{ 
       if ( $1 ~ /Bank Locator/ ) {
         mBank=$2;
@@ -94,12 +102,14 @@ function ubuntuMemoryNodeAwkScript() {
     /^$/ {   
       if (found > 0) {
         if (mSize+0 == 0){ freeSlots++}
-        found = 0;
+        
         print "item=\""dimId"\" attribute=\"Size\" value=\""mSize"\" generateHwInventoryXmlRecord; ";
         print "item=\""dimId"\" attribute=\"Speed\" value=\""mSpeed"\" generateHwInventoryXmlRecord; ";
         print "item=\""dimId"\" attribute=\"Form Factor\" value=\""mFormFactor"\" generateHwInventoryXmlRecord; ";
         print "item=\""dimId"\" attribute=\"Bank Label\" value=\""mBank"\" generateHwInventoryXmlRecord; ";
-      } 
+
+        mSize=0; found = 0;
+      }
     }
     END{ print "item=\"Physical\" attribute=\"Free Memory Slots\" value=\""freeSlots"\" generateHwInventoryXmlRecord; "; }
     '
@@ -107,16 +117,16 @@ function ubuntuMemoryNodeAwkScript() {
 
 function ubuntuDrivesNodeEnumerator() {
   echo "node=$drivesNodeNumber"
-    
+
   cat $hardwareInfo | 
   awk -F ": " '
   BEGIN{
   nodesFound=0;
-  diskNum=0;
+
   nodeType=0;
   found=0;
   iType="SCSI";
-  
+
   }
   function printCdRomInfo() {
     print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; "; 
@@ -127,11 +137,10 @@ function ubuntuDrivesNodeEnumerator() {
     print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
     print "item=\""diskNum"\" attribute=\"Interface Type\" value=\""iType"\" generateHwInventoryXmlRecord; ";
     print "item=\""diskNum"\" attribute=\"Size\" value=\""size"\" generateHwInventoryXmlRecord; ";
-    vendor=""; product="";size="";name="";
+    vendor=""; product="";size="";
     diskNum++;
   }
-  function printOtherInfo() {
-    
+  function printOtherInfo() { 
     freeSpace="`sudo df -k -P "name" | awk '"'"'NR==2{print $4/(1024*1024)}'"'"'`";
     size="`sudo df -k -P "name" | awk '"'"'NR==2{print $2/(1024*1024)}'"'"'`";
     
@@ -140,14 +149,16 @@ function ubuntuDrivesNodeEnumerator() {
     print "item=\""name"\" attribute=\"Volume Name\" value=\""logicalName"\" generateHwInventoryXmlRecord; ";
     print "item=\""name"\" attribute=\"Volume Serial Number\" value=\""serial"\" generateHwInventoryXmlRecord; ";
     print "item=\""name"\" attribute=\"File System\" value=\""description"\" generateHwInventoryXmlRecord; ";
+    
     size = ""; freeSpace="";capacity= "";
-    name="";serial="";description="";logicalName="";
+    name="";serial="";description="";
     diskNum++;
   }
   
   function printPrevious() {
     if (nodesFound > 0) {
-      #print nodeType;
+      #debug
+      #print "type: "nodeType".Prev name: "name" "$0;
       if (nodeType == 0) {
         printOtherInfo();
       }
@@ -157,13 +168,32 @@ function ubuntuDrivesNodeEnumerator() {
       if (nodeType == 2) {
         printDiskInfo();
       }
+      name="";
     }
   }
+
+  #### MAIN FLOW BELOW ####
+  /\*-scsi/{ found=index($0, "-");nodeType=-1;next;}
   
-  /\*-scsi/{ found=1;}
   (found == 0){ next; }
   
-  
+  /\*-/{
+    current=index($0, "-");
+    if ( current <= found) {
+      found = 0;
+    }
+    printPrevious();
+    
+    nodeType=0; 
+    if ( $0 ~ "cdrom"){ nodeType=1;}
+    if ( $0 ~ "disk"){ nodeType=2;}
+    if ( $0 ~ "scsi"){nodeType=-1;}
+    
+    
+    name="";
+    nodesFound++;
+    next;
+  }
   /description:/{description=$2} 
   /product:/{product=$2}
   /vendor:/{vendor=$2} 
@@ -171,23 +201,12 @@ function ubuntuDrivesNodeEnumerator() {
   /logical name:/{ if (name == "") {name=$2 } logicalName=$2;}
   /serial:/{serial=$2} 
   /size:/{size=$2} 
-  /capacity:/{capacity=$2} 
-  /\*-/{ 
-    printPrevious();
-    nodesFound++;
-    nodeType=0;
-  }
-  /\*-cdrom/{ nodeType=1;}
-  /\*-disk/{ nodeType=2;}
-  /\*-scsi/{nodeType=-1}
-  END{
-    printPrevious();
-  }  
+  /capacity:/{capacity=$2}
   '
 }
 
 function ubuntuNetworkNodesEnumerator() {
- 
+
   dhcpFile="dhcp_file_notfound"
   if [ -f "/var/lib/dhcp3/dhclient.leases" ] 
   then
@@ -198,7 +217,8 @@ function ubuntuNetworkNodesEnumerator() {
      dhcpFile="/var/lib/dhcp/dhclient.leases"
   fi
 
-  echo "node=$networkNodeNumber"
+  echo "node=$networkNodesNumber"
+
   cat $hardwareInfo | 
     awk -F ": " -vdhcpFile="$dhcpFile" '
     BEGIN{found=0; interfaceNum=10} 
@@ -487,7 +507,7 @@ function domainroleNode() {
 
 function awkScriptMaker() {
 
-  tmpAwkOutputScript="._tmp-awk-output.sh"
+  tmpAwkOutputScript="._tmp-awk-output.sh-$1"
   executePassedAwk $1 > $tmpAwkOutputScript
   sudo chmod +x $tmpAwkOutputScript  
   ./$tmpAwkOutputScript

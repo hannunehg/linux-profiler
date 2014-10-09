@@ -5,12 +5,14 @@
 
 # Main Xml Format
 function xmlOutput() {
+  tmpPrograms="._programs.xml"
   # Software node
   echo "<programs>"
   if [[ -z  $DEVELOPER  ]]
   then
-  programsNodeEnumerator
+  programsNodeEnumerator > $tmpPrograms
   fi
+  cat $tmpPrograms
   echo "</programs>"
 
   # Hw Inventory node
@@ -69,8 +71,8 @@ echo -e "Running Script '${BASH_SOURCE[0]}' at '`date`'" >$errorLogFile
 # 4- Generate XML Output to file and errors to error log
 xmlOutput 1> $fileMachineInventoryXml 2>>$errorLogFile
 
-# 5- Print xml to standard output (stdou)
-cat $fileMachineInventoryXml 
+# (Commented out)5- Print xml to standard output (stdou)
+#cat $fileMachineInventoryXml 
 
 # 6- Change directory back to origional location
 cd - 1>/dev/null

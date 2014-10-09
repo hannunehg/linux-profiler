@@ -23,17 +23,18 @@ function printUbuntuXmlRecordsGeneratingScript() {
   echo "" > $tmpPkgFile
   
   # 1- append all info from archived logs to tmpPkgFile
-  #i=2
-  #mycount=$(ls -l /var/log/dpkg.log.*.gz | wc -l)
-  #nlogs=$(( $mycount + 1 ))
+  i=2
+  mycount=$(ls -l /var/log/dpkg.log.*.gz | wc -l)
+  nlogs=$(( $mycount + 1 ))
 
-  #while [ $i -le $nlogs ]
-  #do
-  #if [ -e /var/log/dpkg.log.$i.gz ]; then
-  #zcat /var/log/dpkg.log.$i.gz | grep "\ install\ " >> $tmpPkgFile
-  #fi
-  #i=$(( $i+1 ))
-  #done
+  while [ $i -le $nlogs ]
+  do
+  if [ -e /var/log/dpkg.log.$i.gz ]; then
+  zcat /var/log/dpkg.log.$i.gz | grep "\ install\ " >> $tmpPkgFile
+  fi
+  i=$(( $i+1 ))
+
+  done
 
   # 2- append all info from unarchived logs to tmpPkgFile
   i=1
@@ -45,6 +46,7 @@ function printUbuntuXmlRecordsGeneratingScript() {
   cat /var/log/dpkg.log.$i | grep "\ install\ " >> $tmpPkgFile
   fi
   i=$(( $i+1 ))
+
   done
 
   # 3- append current log to tmpPkgFile

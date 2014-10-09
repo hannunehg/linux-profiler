@@ -1,7 +1,4 @@
 #!/bin/bash
-
-
-
 . common-hardware-extraction-functions.lib
 
 # Parent Nodes functions
@@ -126,10 +123,10 @@ function drivesNodeEnumerator() {
 }
 
 function networkNodesEnumerator() {
-  node=$networkNodesNumber
   case $OS in
     Linux)
-      awkScriptMaker ubuntuNetworkNodesEnumerator
+      awkScriptMaker ubuntuNetworkNodesEnumerator 
+	
   	  ;;	
     *)		
       echo "Unsupported OS: $OS" >&2;;
