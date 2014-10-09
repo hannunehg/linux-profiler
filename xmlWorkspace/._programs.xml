@@ -1,4 +1,3 @@
-<programs>
 <record>
     <displayname><![CDATA[tomboy]]></displayname>
     <displayversion><![CDATA[1.15.4-0ubuntu1]]></displayversion>
@@ -20059,74 +20058,3 @@
     <installdate><![CDATA[2014-04-17 01:21:23]]></installdate>
     <installlocation></installlocation>
 </record>
-</programs>
-<hwinventory>
-<record>
-    <node>1</node>
-    <item><![CDATA[Motherboard]]></item>
-    <attribute><![CDATA[Manufacturer]]></attribute>
-    <value><![CDATA[ASUSTeK Computer INC.]]></value>
-</record>
-<record>
-    <node>2</node>
-    <item><![CDATA[Operating System]]></item>
-    <attribute><![CDATA[Manufacturer]]></attribute>
-    <value><![CDATA[Ubuntu]]></value>
-</record>
-<record>
-    <node>2</node>
-    <item><![CDATA[Operating System]]></item>
-    <attribute><![CDATA[Type]]></attribute>
-    <value><![CDATA[trusty]]></value>
-</record>
-<record>
-    <node>2</node>
-    <item><![CDATA[Operating System]]></item>
-    <attribute><![CDATA[Version]]></attribute>
-    <value><![CDATA[14.04]]></value>
-</record>
-<record>
-    <node>2</node>
-    <item><![CDATA[Operating System]]></item>
-    <attribute><![CDATA[Install Date]]></attribute>
-    <value><![CDATA[2014-07-08 18:06]]></value>
-</record>
-<record>
-    <node>2</node>
-    <item><![CDATA[Operating System]]></item>
-    <attribute><![CDATA[Architecture]]></attribute>
-    <value><![CDATA[x86_64]]></value>
-</record>
-<record>
-    <node>2</node>
-    <item><![CDATA[Operating System]]></item>
-    <attribute><![CDATA[Description]]></attribute>
-    <value><![CDATA[Ubuntu 14.04 LTS]]></value>
-</record>
-<record>
-    <node>4</node>
-    <item><![CDATA[Physical]]></item>
-    <attribute><![CDATA[Total]]></attribute>
-    <value><![CDATA[4294967296]]></value>
-</record>
-</hwinventory>
-<hardware>
-<record>
-    <manufacturer>ASUSTeK Computer INC.</manufacturer>
-    <version></model>
-    <product></product>
-    <serialnumber></serialnumber>
-    <partnumber></partnumber>
-    <bios></bios>
-    <os></os>
-    <processors></processors>
-    <physicalmemory>4294967296</physicalmemory>
-    <physicalmemorydet></physicalmemorydet>
-    <visiblememory></visiblememory>
-    <displayadapters></displayadapters>
-    <networkadapters></networkadapters>
-    <diskdrives></diskdrives>
-    <cdromdrives></cdromdrives>
-    <chassis></chassis>
-</record>
-</hardware>

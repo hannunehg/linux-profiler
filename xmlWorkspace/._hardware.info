@@ -31,7 +31,7 @@ asal-testing
           bus info: cpu@0
           version: Intel(R) Pentium(R) Dual  CPU  E2160  @ 1.80GHz
           slot: CPU 1
-          size: 1200MHz
+          size: 1800MHz
           capacity: 1800MHz
           width: 64 bits
           clock: 800MHz
@@ -204,7 +204,7 @@ asal-testing
                 width: 64 bits
                 clock: 33MHz
                 capabilities: pm msi pciexpress msix vpd bus_master cap_list rom ethernet physical tp mii 10bt 10bt-fd 100bt 100bt-fd 1000bt 1000bt-fd autonegotiation
-                configuration: autonegotiation=on broadcast=yes driver=r8169 driverversion=2.3LK-NAPI duplex=full ip=10.10.140.238 latency=0 link=yes multicast=yes port=MII speed=100Mbit/s
+                configuration: autonegotiation=on broadcast=yes driver=r8169 driverversion=2.3LK-NAPI duplex=full ip=10.10.140.38 latency=0 link=yes multicast=yes port=MII speed=100Mbit/s
                 resources: irq:42 ioport:e800(size=256) memory:febff000-febfffff memory:fdff0000-fdffffff memory:febc0000-febdffff
         *-usb:3
              description: USB controller
@@ -367,13 +367,12 @@ asal-testing
                 physical id: 2
                 bus info: scsi@0:0.1.0,2
                 logical name: /dev/sda2
-                logical name: /media/asal/14605CE5605CCF5C
                 version: 3.1
                 serial: 7abd6952-ac21-9347-a12c-265f8bddcebe
                 size: 100GiB
                 capacity: 100GiB
                 capabilities: primary ntfs initialized
-                configuration: clustersize=4096 created=2014-07-08 23:22:36 filesystem=ntfs mount.fstype=fuseblk mount.options=rw,nosuid,nodev,relatime,user_id=0,group_id=0,default_permissions,allow_other,blksize=4096 state=mounted
+                configuration: clustersize=4096 created=2014-07-08 23:22:36 filesystem=ntfs state=clean
            *-volume:2
                 description: Extended partition
                 physical id: 3

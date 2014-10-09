@@ -2,7 +2,7 @@
 
 hardwareInfo="._hardware.info"
 OEMMsg="To be filled by O.E.M."
-nullMsg="NULL"
+nullMsg=""
 
   systemNodeNumber=1
   osNodeNumber=2
@@ -336,10 +336,11 @@ function manufacturerNode() {
       echo "Unsupported OS: $OS" >&2;;
   esac 
 }
-function modelNode() {
+# Motherboard version
+function versionNode() {
   case $OS in
     *)		
-      echo "$OEMMsg"
+      sudo dmidecode -t 2 | awk -F ": " '/Version/{ print $2 }';;
     ;;
   esac
 }

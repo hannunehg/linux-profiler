@@ -1,0 +1,11 @@
+#!/bin/bash
+. common-hardware-extraction-functions.lib
+node=3
+item="CPU0" attribute="Manufacturer" value="GenuineIntel" generateHwInventoryXmlRecord; 
+item="CPU0" attribute="Version" value="15" generateHwInventoryXmlRecord; 
+item="CPU0" attribute="Name" value="Intel(R) Pentium(R) Dual  CPU  E2160  @ 1.80GHz" generateHwInventoryXmlRecord; 
+item="CPU0" attribute="Speed" value="1200.000" generateHwInventoryXmlRecord; 
+item="CPU1" attribute="Manufacturer" value="GenuineIntel" generateHwInventoryXmlRecord; 
+item="CPU1" attribute="Version" value="15" generateHwInventoryXmlRecord; 
+item="CPU1" attribute="Name" value="Intel(R) Pentium(R) Dual  CPU  E2160  @ 1.80GHz" generateHwInventoryXmlRecord; 
+item="CPU1" attribute="Speed" value="1800.000" generateHwInventoryXmlRecord; 
