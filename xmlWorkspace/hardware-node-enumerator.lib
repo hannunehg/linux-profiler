@@ -15,78 +15,30 @@
 #  esac 
 # 
 . common-hardware-extraction-functions.lib
+. common-auxiliary-functions.lib
 
-#--------------------Hardware Node XML Record Formatter------------------------#
-function generateHardwareXmlRecord() {
-  
- 
-echo -e "<record>"
-if [[ ! -z $manufacturer && ${manufacturer+x} ]]
-then
-  echo -e "    <manufacturer>$manufacturer</manufacturer>"
-fi
-
-if [[ ! -z $product && ${product+x} ]]
-then
-  echo -e "    <product>$product</product>"
-fi
-
-if [[ ! -z $version && ${version+x} ]]
-then
-  echo -e "    <version>$version</version>"
-fi
-if [[ ! -z $serialnumber && ${serialnumber+x} ]]
-then
-  echo -e "    <serialnumber>$serialnumber</serialnumber>"
-fi
-if [[ ! -z $bios && ${bios+x} ]]
-then
-  echo -e "    <bios>$bios</bios>"
-fi
-if [[ ! -z $os && ${os+x} ]]
-then
-  echo -e "    <os>$os</os>"
-fi
-if [[ ! -z $processors && ${processors+x} ]]
-then
-  echo -e "    <processors>$processors</processors>"
-fi
-if [[ ! -z $physicalmemory && ${physicalmemory+x} ]]
-then
-  echo -e "    <physicalmemory>$physicalmemory</physicalmemory>"
-fi
-if [[ ! -z $physicalmemorydet && ${physicalmemorydet+x} ]]
-then
-  echo -e "    <physicalmemorydet>$physicalmemorydet</physicalmemorydet>"
-fi
-if [[ ! -z $visiblememory && ${visiblememory+x} ]]
-then
-  echo -e "    <visiblememory>$visiblememory</visiblememory>"
-fi
-if [[ ! -z $displayadapters && ${displayadapters+x} ]]
-then
-  echo -e "    <displayadapters>$displayadapters</displayadapters>"
-fi
-if [[ ! -z $networkadapters && ${networkadapters+x} ]]
-then
-  echo -e "    <networkadapters>$networkadapters</networkadapters>"
-fi
-if [[ ! -z $diskdrives && ${diskdrives+x} ]]
-then
-  echo -e "    <diskdrives>$diskdrives</diskdrives>"
-fi
-if [[ ! -z $cdromdrives && ${cdromdrives+x} ]]
-then
-  echo -e "    <cdromdrives>$cdromdrives</cdromdrives>"
-fi
-if [[ ! -z $chassis && ${chassis+x} ]]
-then
-  echo -e "    <chassis>$chassis</chassis>"
-fi
-echo -e "</record>"
+function mainNodeEnumerator() {
+  manufacturer=$(manufacturerNode)
+  version=$(versionNode)
+  product=$(productNode)
+  serialnumber=$(serialnumberNode)
+  partnumber=$(partnumberNode)
+  bios=$(biosNode)
+  os=$(osNode)
+  processors=$(processorsNode)
+  physicalmemory=$(physicalmemoryNode)
+  physicalmemorydet=$(physicalmemorydetNode)
+  visiblememory=$(visiblememoryNode)
+  displayadapters=$(displayadaptersNode)
+  networkadapters=$(networkadaptersNode)
+  diskdrives=$(diskdrivesNode)
+  cdromdrives=$(cdromdrivesNode)
+  chassis=$(chassisNode)
+  domainrole=$(domainroleNode)
+  generateHardwareXmlRecord
 }
   
-#-------------------------------Hardware Node Functions-------------------------------#
+#---------------------------Hardware Node Functions----------------------------#
 function productNode() {
   case $OS in
     Linux)
@@ -119,16 +71,31 @@ function processorsNode() {
 function physicalmemorydetNode() {
   case $OS in
     Linux)
-    	 sudo dmidecode memory | awk -v "found=0" 'BEGIN{ OFMT = "%.0f"; mSize=0; dimNum=0; ORS="; "} /Size/{mSize=$2;} /DIMM[0-9]/{ found=NR ;} (found !=0) && (NR == found ){ dimNum=$2 } (found!=0) && (NR == found + 4){ print "["dimNum"] " mSize*1024*1024"/"$2}';;	
+    	 sudo dmidecode memory | 
+    	  awk -v "found=0" '
+    	  BEGIN{ OFMT = "%.0f"; mSize=0; dimNum=0; ORS="; "} 
+    	  /Size/{mSize=$2;} 
+    	  /DIMM[0-9]/{ found=NR ;} 
+    	  (found !=0) && (NR == found ){ dimNum=$2 } 
+    	  (found!=0) && (NR == found + 4){ 
+    	    print "["dimNum"] " mSize*1024*1024"/"$2
+    	  }';;	
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac
   
 }
 function diskdrivesNode() {
-drivesInfoXml |  awk -F "[\[\]]" '(value == "Model"){model=$3;} (value == "Interface Type"){iType=$3;}  (value == "Size"){size=$3} {value=$3;} (model != "") && (iType != "") &&(size != "")  {print model" ["size" "iType"];"; model=""; iType=""; size="";} '
-
+  drivesInfoXml |  
+    awk -F "[\[\]]" '
+    (value == "Model"){model=$3;} 
+    (value == "Interface Type"){iType=$3;}  
+    (value == "Size"){size=$3} {value=$3;} 
+    (model != "") && (iType != "") &&(size != "") {
+    print model" ["size" "iType"];"; model=""; iType=""; size="";
+    }'
 }
+
 function networkadaptersNode() {
   case $OS in
     Linux)
@@ -144,9 +111,14 @@ function networkadaptersNode() {
         /vendor/ {vendor=$2} 
         /product/{product=$2} 
         /serial:/{
-        serial=$2; cmd1="sudo ifconfig | grep -i "$2" -A3 | awk '"'"' /inet6/{print $3}'"'"'";cmd1 | getline ipSix} 
+          serial=$2; 
+          c="sudo ifconfig | grep -i "$2" -A3 |awk '"'"'/inet6/{print $3}'"'"'";
+          c | getline ipSix
+        } 
         /configuration:/{
-        configs=$2; cmd="echo " configs " | awk -F '"'[= ]'"' '"'"'{ print $12 }'"'"' "; cmd | getline ipFour
+          configs=$2; 
+          cmd="echo "configs" | awk -F '"'[= ]'"' '"'"'{ print $12 }'"'"' "; 
+          cmd | getline ipFour
         }'
   	  ;;	
     *)		
@@ -157,7 +129,13 @@ function networkadaptersNode() {
 function cdromdrivesNode() {
   case $OS in
     Linux)
-    	  sudo cat $hardwareInfo | awk -F ": " '/\*-/{found=0} /\*-cdrom/{found=1} (found == 1) {print $0} ' | awk -F ": " '/description/{description=$2} /product/{product=$2}/vendor/{vendor=$2} END{print vendor" "description" "product}';;	
+    	  sudo cat $hardwareInfo | 
+    	    awk -F ": " '/\*-/{found=0} 
+    	      /\*-cdrom/{found=1} (found == 1) {print $0} ' | 
+    	      awk -F ": " '
+    	      /description/{description=$2} 
+    	      /product/{product=$2}/vendor/{vendor=$2} 
+    	      END{print vendor" "description" "product}';;	
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac

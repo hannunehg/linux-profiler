@@ -1,17 +1,18 @@
 #!/bin/bash
 
 hardwareInfo="._hardware.info"
+# Unused
 OEMMsg="To be filled by O.E.M."
+# Must output empty string so we do not print in xml, so we use this var
 nullMsg=""
 
-  systemNodeNumber=1
-  osNodeNumber=2
-  cpuNodeNumber=3
-  drivesNodeNumber=5
-  memoryNodesNumber=4
-  networkNodesNumber=6
-
-
+systemNodeNumber=1
+osNodeNumber=2
+cpuNodeNumber=3
+drivesNodeNumber=5
+memoryNodesNumber=4
+networkNodesNumber=6
+ 
 # Ubuntu Initialization steps: store lshw output in file for later access
 function Init() {
   case $OS in
@@ -22,53 +23,15 @@ function Init() {
       echo "Unsupported OS: $OS" >&2;;
   esac
 }
-
-#TODO: recall this after development is done
 if [[ -z  $DEVELOPER  ]]
 then
   Init
 fi
-
-
-
-#-------------------Hw Inventory Node XML Record Formatter---------------------#
-thisScriptName=$(basename ${BASH_SOURCE[0]})
-# This function will not echo anything if the value is empty
-function generateHwInventoryXmlRecord() {
-
-if [[ ! -z $item && ${item+x} ]]
-then
-  item="<![CDATA[$item]]>"
-fi
-
-if [[ ! -z $attribute && ${attribute+x} ]]
-then
-  attribute="<![CDATA[$attribute]]>"
-fi
-
-if [[ ! -z $value && ${value+x} ]]
-then
-  value="<![CDATA[$value]]>"
-else
-  return
-fi
-
-echo -e "<record>
-    <node>$node</node>
-    <item>$item</item>
-    <attribute>$attribute</attribute>
-    <value>$value</value>
-</record>"
-}
-
-
 #-------------------------------Common Functions-------------------------------#
-
 function manufacturerNode() {
   case $OS in
     Linux)
     	sudo dmidecode -t 2 | awk -F ": " '(NR == 6){ print $2 }';;
-    	
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac 
@@ -92,7 +55,6 @@ function serialnumberNode() {
   case $OS in
     Linux)
     	sudo dmidecode -t 2 | awk -F ": " '(NR == 9){ print $2 }';;
-    	
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac 
@@ -101,8 +63,7 @@ function biosNode() {
   case $OS in
     Linux)
     	sudo dmidecode -t 0 |
-        awk -F ": " '(NR == 7){ print $2 }' | tr -d ' ';;
-    	
+        awk -F ": " '(NR == 7){ print $2 }' | tr -d ' ';;  	
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac 
@@ -126,13 +87,17 @@ function chassisNode() {
 function physicalmemoryNode() {
   case $OS in
     Linux)
-    	 sudo dmidecode memory | awk -v "found=0" 'BEGIN{ OFMT = "%.0f"; mSize=0; totalSize=0} /Size/{mSize=$2*1024*1024;} /DIMM[0-9]/{ found=NR ; totalSize+=mSize} END{print totalSize}'
-;;	
+    	 sudo dmidecode memory | 
+    	  awk -v "found=0" '
+    	  BEGIN{ OFMT = "%.0f"; mSize=0; totalSize=0} 
+    	  /Size/{mSize=$2*1024*1024;} 
+    	  /DIMM[0-9]/{ found=NR ; totalSize+=mSize} 
+    	  END{print totalSize}'
+      ;;	
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac 
 }
-
 function visiblememoryNode() {
   case $OS in
     Linux)
@@ -151,82 +116,94 @@ function drivesInfoXml() {
       echo "Unsupported OS: $OS" >&2;;
   esac
 }
+function ubuntuDrivesNodeEnumerator() {
+  echo "node=$drivesNodeNumber"
 
+  cat $hardwareInfo | 
+  awk -F ": " '
+  BEGIN{
+  nodesFound=0;
 
+  nodeType=0;
+  found=0;
+  iType="SCSI";
 
+  }
+  function printCdRomInfo() {
+    print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; "; 
+    vendor=""; product="";
+    diskNum++;
+  }
+  function printDiskInfo() {
+    print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
+    print "item=\""diskNum"\" attribute=\"Interface Type\" value=\""iType"\" generateHwInventoryXmlRecord; ";
+    print "item=\""diskNum"\" attribute=\"Size\" value=\""size"\" generateHwInventoryXmlRecord; ";
+    vendor=""; product="";size="";
+    diskNum++;
+  }
+  function printOtherInfo() { 
+    freeSpace="`sudo df -k -P "name" | awk '"'"'NR==2{print $4/(1024*1024)}'"'"'`";
+    size="`sudo df -k -P "name" | awk '"'"'NR==2{print $2/(1024*1024)}'"'"'`";
+    
+    print "item=\""name"\" attribute=\"Partition Size (Gib)\" value=\""size"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Free Space (Gib)\" value=\""freeSpace"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Volume Name\" value=\""logicalName"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Volume Serial Number\" value=\""serial"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"File System\" value=\""description"\" generateHwInventoryXmlRecord; ";
+    
+    size = ""; freeSpace="";capacity= "";
+    name="";serial="";description="";
+    diskNum++;
+  }
+  
+  function printPrevious() {
+    if (nodesFound > 0) {
+      #debug
+      #print "type: "nodeType".Prev name: "name" "$0;
+      if (nodeType == 0) {
+        printOtherInfo();
+      }
+      if (nodeType == 1) {
+        printCdRomInfo();
+      } 
+      if (nodeType == 2) {
+        printDiskInfo();
+      }
+      name="";
+    }
+  }
 
-
-#------------------------------Auxiliary Functions-----------------------------#
-
-function awkScriptMaker() {
-
-  tmpAwkOutputScript="._tmp-awk-output.sh-$1"
-  executePassedAwk $1 > $tmpAwkOutputScript
-  sudo chmod +x $tmpAwkOutputScript  
-  ./$tmpAwkOutputScript
+  #### MAIN FLOW BELOW ####
+  /\*-scsi/{ found=index($0, "-");nodeType=-1;next;}
+  
+  (found == 0){ next; }
+  
+  /\*-/{
+    current=index($0, "-");
+    if ( current <= found) {
+      found = 0;
+    }
+    printPrevious();
+    
+    nodeType=0; 
+    if ( $0 ~ "cdrom"){ nodeType=1;}
+    if ( $0 ~ "disk"){ nodeType=2;}
+    if ( $0 ~ "scsi"){nodeType=-1;}
+    
+    
+    name="";
+    nodesFound++;
+    next;
+  }
+  /description:/{description=$2} 
+  /product:/{product=$2}
+  /vendor:/{vendor=$2} 
+  /bus info:/{bus=$2} 
+  /logical name:/{ if (name == "") {name=$2 } logicalName=$2;}
+  /serial:/{serial=$2} 
+  /size:/{size=$2} 
+  /capacity:/{capacity=$2}
+  '
 }
-
-function executePassedAwk() {
-  echo "#!/bin/bash"
-  echo ". $thisScriptName"
-  $1
-}
-
-function chasisTypes() {
-case $1 in
-    Other)
-    	 echo 1;;	
-    Unknown)
-    	 echo 2;;
-    Desktop)
-    	 echo 3;;
-    "Low Profile Desktop")
-    	 echo 4;;
-    "Pizza Box")
-    	 echo 5;;
-    "Mini Tower")
-    	 echo 6;;
-    Tower)
-    	 echo 7;;
-    Portable)
-    	 echo 8;;
-    Laptop)
-    	 echo 9;;
-    Notebook)
-    	 echo 10;;
-    "Hand Held")
-    	 echo 11;;
-    "Docking Station")
-    	 echo 12;;
-    "All in One")
-    	 echo 13;;
-    "Sub Notebook")
-    	 echo 14;;
-    "Space-Saving")
-    	 echo 15;;
-    "Lunch Box")
-    	 echo 16;;
-    "Main System Chassis")
-    	 echo 17;;
-    "Expansion Chassis")
-    	 echo 18;;
-    "Sub Chassis")
-    	 echo 19;;
-    "Bus Expansion Chassis")
-    	 echo 20;;
-    "Peripheral Chassis")
-    	 echo 21;;
-    "Storage Chassis")
-    	 echo 22;;
-    "Rack Mount Chassis")
-    	 echo 23;;
-    "Sealed-Case PC")
-    	 echo 24;;
-    *)		
-      echo -1 
-      echo "Unsupported Chassis type: $1" >&2;;
-esac
-}
-
 
 

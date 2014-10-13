@@ -2,140 +2,92 @@
 # this file's output is a script.
 
 thisScriptName=$(basename ${BASH_SOURCE[0]})
+. common-auxiliary-functions.lib
 
-function printXmlRecordsGeneratingScript() {
-  echo "#!/bin/bash"
-  echo ". $thisScriptName"
-
+function mainNodeEnumerator() {
   case $OS in
     Linux)
-    	printUbuntuXmlRecordsGeneratingScriptFromDpkg;;
-    *)		
+      awkScriptMaker ubuntuProgramsNodeEnumerator
+    ;;
+    Darwin)
+      awkScriptMaker darwinProgramsNodeEnumerator
+    ;;
+    *)	
       echo "Unsupported OS: $OS" >&2;;
   esac
 }
-
-function printUbuntuXmlRecordsGeneratingScriptFromDpkg() {
-dpkg-query -l | awk -F "[: ]" '/ii/{print $3}' | xargs dpkg-query --print-avail | 
-  awk -F ": " '
-  function printXmlCmd() {
-    print "displayname=\""displayname"\"; displayversion=\""displayversion"\"; publisher=\""publisher"\"; urlinfoabout=\""urlinfoabout"\"; comments=\""comments"\"; generateProgramsXmlRecord"
-  }
-  /Package/{displayname=$2} 
-  /Version:/{displayversion=$2} 
-  /Maintainer:/{publisher=$2} 
-  /Homepage:/{urlinfoabout=$2} 
-  /Description:/{comments="$2"} 
-  /^$/ {
-    printXmlCmd()
-  } 
-  END {
-    printXmlCmd()
-  }'
-
+function ubuntuProgramsNodeEnumerator() {
+  dpkg-query -l | 
+    awk -F "[: ]" '/ii/{print $3}' | 
+      xargs dpkg-query --print-avail | 
+    awk -F ": " '
+    function printXmlCmd() {
+      print "displayname=\""displayname"\";"
+      print "displayversion=\""displayversion"\";"
+      print "publisher=\""publisher"\"; "
+      print "urlinfoabout=\""urlinfoabout"\"; "
+      print "comments=\""comments"\"; generateProgramsXmlRecord"
+    }
+    /Package/{displayname=$2} 
+    /Version:/{displayversion=$2} 
+    /Maintainer:/{publisher=$2} 
+    /Homepage:/{urlinfoabout=$2} 
+    /Description:/{comments="$2"} 
+    /^$/ {
+      printXmlCmd()
+    } 
+    END {
+      printXmlCmd()
+    }'
 }
-
-# extract from logs
-function printUbuntuXmlRecordsGeneratingScriptFromLogs() {
-  tmpPkgListFile="._tmp-pkg-list"
-  tmpPkgFile="._tmp-pkg-file"
-  tmpPkgDetailsFile="._tmp-pkg-details-file"
-  echo "" > $tmpPkgFile
-  
-  # 1- append all info from archived logs to tmpPkgFile
-  i=2
-  mycount=$(ls -l /var/log/dpkg.log.*.gz | wc -l)
-  nlogs=$(( $mycount + 1 ))
-
-  while [ $i -le $nlogs ]
-  do
-  if [ -e /var/log/dpkg.log.$i.gz ]; then
-  zcat /var/log/dpkg.log.$i.gz | grep "\ install\ " >> $tmpPkgFile
-  fi
-  i=$(( $i+1 ))
-
-  done
-
-  # 2- append all info from unarchived logs to tmpPkgFile
-  i=1
-  nulogs=$(ls -l /var/log/dpkg.log.* | wc -l)
-  nulogs=$(( $nulogs - $nlogs + 1 ))
-  while [ $i -le $nulogs ]
-  do
-  if [ -e /var/log/dpkg.log.$i ]; then
-  cat /var/log/dpkg.log.$i | grep "\ install\ " >> $tmpPkgFile
-  fi
-  i=$(( $i+1 ))
-
-  done
-
-  # 3- append current log to tmpPkgFile
-  cat /var/log/dpkg.log | grep "\ install\ " >> $tmpPkgFile
-
-  # 4- sort tmpPkgFile (by date reverse order from latest) into tmpPkgListFile
-  sort -n -r $tmpPkgFile > $tmpPkgListFile
-  
-  # 5- find each package's details and store it to tmpPkgDetailsFile
-  cat $tmpPkgListFile | awk -F "[: ]" '{print $6;}' | xargs dpkg --print-avail | 
-  awk -F ": " '
-  /Package/{displayname=$2} 
-  /Version:/{displayversion=$2} 
-  /Maintainer:/{publisher=$2} 
-  /Homepage:/{urlinfoabout=$2} 
-  /Description:/{comments="$2"} 
-  /^$/ {
-    print "displayname=\""displayname"\"; displayversion=\""displayversion"\"; publisher=\""publisher"\"; urlinfoabout=\""urlinfoabout"\"; comments=\""comments"\"; "
-  } 
-  END {
-    print "displayname=\""displayname"\"; displayversion=\""displayversion"\"; publisher=\""publisher"\"; urlinfoabout=\""urlinfoabout"\"; comments=\""comments"\"; "
-  }' > $tmpPkgDetailsFile
-
-  # parse & print info from tmp files: tmpPkgListFile & tmpPkgDetailsFile
-  awk -F "[: ]" '
-  BEGIN{OFS=":"}
-  (FNR==1){file_num+=1} 
-  (file_num==1) && !/^$/{myarr[FNR]=$1" "$2":"$3":"$4;} 
-  (file_num==2){ print "installdate=\""myarr[FNR]"\"; "$0" generateProgramsXmlRecord;"}' $tmpPkgListFile $tmpPkgDetailsFile 
+function darwinProgramsNodeEnumerator() {
+  system_profiler -xml SPApplicationsDataType | awk -F "[><]" '
+    BEGIN {
+    first=1;
+    }
+    function printXmlCmd() {
+      print "displayname=\""displayname"\";"
+      print "displayversion=\""displayversion"\";"
+      print "publisher=\""publisher"\"; "
+      print "comments=\""comments"\"; "
+      print "installdate=\""installdate"\"; "
+      print "installlocation=\""installlocation"\"; "
+      print "urlinfoabout=\""urlinfoabout"\"; "
+      print "contact=\""contact"\"; "
+      print "generateProgramsXmlRecord"   
+      displayname=""; displayversion=""; publisher="";urlinfoabout="";
+      comments=""; contact=""; installdate=""; installlocation="";
+    }
+    ($2 ~ "key"){ key=$3;}
+    
+    ($2 ~ "string") || ($2 ~ "date"){
+      if (key == "_name"){ 
+        if (first==1){ first = 0; displayname=$3} 
+        else { printXmlCmd();  displayname=$3; }
+      }
+      if (key == "version") { displayversion=$3;}
+      if (key == "obtained_from") { publisher=$3; }
+      if (key == "info") { comments=$3;}
+      if (key == "lastModified") { installdate=$3;}
+      if (key == "path") { installlocation=$3;}       
+    }
+    END{
+      printXmlCmd(); 
+    }
+    '
 }
 
 
 
-#---------------------Programs Node XML Record Formatter-----------------------#
-function generateProgramsXmlRecord() {
 
-echo -e "<record>"
-if [[ ! -z $displayname && ${displayname+x} ]]
-then
-  echo -e "    <displayname>$displayname</displayname>"
-fi
 
-if [[ ! -z $displayversion && ${displayversion+x} ]]
-then
-  echo -e "    <displayversion>$displayversion</displayversion>"
-fi
-if [[ ! -z $publisher && ${publisher+x} ]]
-then
-  echo -e "    <publisher>`echo $publisher | sed \"s/>//g;s/<//g\"`</publisher>"
-fi
-if [[ ! -z $contact && ${contact+x} ]]
-then
-  echo -e "    <contact>$contact</contact>"
-fi
-if [[ ! -z $urlinfoabout && ${urlinfoabout+x} ]]
-then
-  echo -e "    <urlinfoabout>$urlinfoabout</urlinfoabout>"
-fi
-if [[ ! -z $comments && ${comments+x} ]]
-then
-  echo -e "    <comments>$comments</comments>"
-fi
-if [[ ! -z $installdate && ${installdate+x} ]]
-then
-  echo -e "    <installdate>$installdate</installdate>"
-fi
-if [[ ! -z $installlocation && ${installlocation+x} ]]
-then
-  echo -e "    <installlocation>$installlocation</installlocation>"
-fi
-echo -e "</record>" 
-}
+
+
+
+
+
+
+
+
+
+

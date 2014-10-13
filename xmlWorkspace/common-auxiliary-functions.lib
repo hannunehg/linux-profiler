@@ -1,0 +1,204 @@
+#!/bin/bash
+
+#-------------------Hw Inventory Node XML Record Formatter---------------------#
+thisScriptName=$(basename ${BASH_SOURCE[0]})
+# This function will not echo anything if the value is empty
+function generateHwInventoryXmlRecord() {
+
+  if [[ ! -z $item && ${item+x} ]]
+  then
+    item="<![CDATA[$item]]>"
+  fi
+
+  if [[ ! -z $attribute && ${attribute+x} ]]
+  then
+    attribute="<![CDATA[$attribute]]>"
+  fi
+
+  if [[ ! -z $value && ${value+x} ]]
+  then
+    value="<![CDATA[$value]]>"
+  else
+    return
+  fi
+
+  echo -e "<record>
+    <node>$node</node>
+    <item>$item</item>
+    <attribute>$attribute</attribute>
+    <value>$value</value>
+</record>"
+}
+#--------------------Hardware Node XML Record Formatter------------------------#
+function generateHardwareXmlRecord() { 
+echo -e "<record>"
+if [[ ! -z $manufacturer && ${manufacturer+x} ]]
+then
+  echo -e "    <manufacturer>$manufacturer</manufacturer>"
+fi
+if [[ ! -z $product && ${product+x} ]]
+then
+  echo -e "    <product>$product</product>"
+fi
+
+if [[ ! -z $version && ${version+x} ]]
+then
+  echo -e "    <version>$version</version>"
+fi
+if [[ ! -z $serialnumber && ${serialnumber+x} ]]
+then
+  echo -e "    <serialnumber>$serialnumber</serialnumber>"
+fi
+if [[ ! -z $bios && ${bios+x} ]]
+then
+  echo -e "    <bios>$bios</bios>"
+fi
+if [[ ! -z $os && ${os+x} ]]
+then
+  echo -e "    <os>$os</os>"
+fi
+if [[ ! -z $processors && ${processors+x} ]]
+then
+  echo -e "    <processors>$processors</processors>"
+fi
+if [[ ! -z $physicalmemory && ${physicalmemory+x} ]]
+then
+  echo -e "    <physicalmemory>$physicalmemory</physicalmemory>"
+fi
+if [[ ! -z $physicalmemorydet && ${physicalmemorydet+x} ]]
+then
+  echo -e "    <physicalmemorydet>$physicalmemorydet</physicalmemorydet>"
+fi
+if [[ ! -z $visiblememory && ${visiblememory+x} ]]
+then
+  echo -e "    <visiblememory>$visiblememory</visiblememory>"
+fi
+if [[ ! -z $displayadapters && ${displayadapters+x} ]]
+then
+  echo -e "    <displayadapters>$displayadapters</displayadapters>"
+fi
+if [[ ! -z $networkadapters && ${networkadapters+x} ]]
+then
+  echo -e "    <networkadapters>$networkadapters</networkadapters>"
+fi
+if [[ ! -z $diskdrives && ${diskdrives+x} ]]
+then
+  echo -e "    <diskdrives>$diskdrives</diskdrives>"
+fi
+if [[ ! -z $cdromdrives && ${cdromdrives+x} ]]
+then
+  echo -e "    <cdromdrives>$cdromdrives</cdromdrives>"
+fi
+if [[ ! -z $chassis && ${chassis+x} ]]
+then
+  echo -e "    <chassis>$chassis</chassis>"
+fi
+echo -e "</record>"
+}
+
+#---------------------Programs Node XML Record Formatter-----------------------#
+function generateProgramsXmlRecord() {
+  echo -e "<record>"
+  if [[ ! -z $displayname && ${displayname+x} ]]
+  then
+    echo -e "    <displayname>$displayname</displayname>"
+  fi
+  if [[ ! -z $displayversion && ${displayversion+x} ]]
+  then
+    echo -e "    <displayversion>$displayversion</displayversion>"
+  fi
+  if [[ ! -z $publisher && ${publisher+x} ]]
+  then
+    echo "    <publisher>`echo $publisher | sed \"s/>//g;s/<//g\"`</publisher>"
+  fi
+  if [[ ! -z $contact && ${contact+x} ]]
+  then
+    echo -e "    <contact>$contact</contact>"
+  fi
+  if [[ ! -z $urlinfoabout && ${urlinfoabout+x} ]]
+  then
+    echo -e "    <urlinfoabout>$urlinfoabout</urlinfoabout>"
+  fi
+  if [[ ! -z $comments && ${comments+x} ]]
+  then
+    echo -e "    <comments>$comments</comments>"
+  fi
+  if [[ ! -z $installdate && ${installdate+x} ]]
+  then
+    echo -e "    <installdate>$installdate</installdate>"
+  fi
+  if [[ ! -z $installlocation && ${installlocation+x} ]]
+  then
+    echo -e "    <installlocation>$installlocation</installlocation>"
+  fi
+  echo -e "</record>" 
+}
+
+
+#------------------------------Auxiliary Functions-----------------------------#
+function awkScriptMaker() {
+  tmpAwkOutputScript="._tmp-awk-output.sh-$1"
+  executePassedAwk $1 > $tmpAwkOutputScript
+  sudo chmod +x $tmpAwkOutputScript  
+  ./$tmpAwkOutputScript
+}
+function executePassedAwk() {
+  echo "#!/bin/bash"
+  echo ". $thisScriptName"
+  $1
+}
+function chasisTypes() {
+  case $1 in
+    Other)
+    	 echo 1;;	
+    Unknown)
+    	 echo 2;;
+    Desktop)
+    	 echo 3;;
+    "Low Profile Desktop")
+    	 echo 4;;
+    "Pizza Box")
+    	 echo 5;;
+    "Mini Tower")
+    	 echo 6;;
+    Tower)
+    	 echo 7;;
+    Portable)
+    	 echo 8;;
+    Laptop)
+    	 echo 9;;
+    Notebook)
+    	 echo 10;;
+    "Hand Held")
+    	 echo 11;;
+    "Docking Station")
+    	 echo 12;;
+    "All in One")
+    	 echo 13;;
+    "Sub Notebook")
+    	 echo 14;;
+    "Space-Saving")
+    	 echo 15;;
+    "Lunch Box")
+    	 echo 16;;
+    "Main System Chassis")
+    	 echo 17;;
+    "Expansion Chassis")
+    	 echo 18;;
+    "Sub Chassis")
+    	 echo 19;;
+    "Bus Expansion Chassis")
+    	 echo 20;;
+    "Peripheral Chassis")
+    	 echo 21;;
+    "Storage Chassis")
+    	 echo 22;;
+    "Rack Mount Chassis")
+    	 echo 23;;
+    "Sealed-Case PC")
+    	 echo 24;;
+    *)		
+      echo -1 
+      echo "Unsupported Chassis type: $1" >&2;;
+  esac
+}

@@ -5,31 +5,29 @@
 
 # Main Xml Format
 function xmlOutput() {
-  tmpPrograms="._programs.xml"
   # Software node
   echo "<programs>"
-  if [[ -z  $DEVELOPER  ]]
-  then
-  programsNodeEnumerator > $tmpPrograms
-  fi
-  cat $tmpPrograms
+    . programs-node-enumerator.lib
+    mainNodeEnumerator
   echo "</programs>"
-
   # Hw Inventory node
   echo "<hwinventory>"
-  hwInventoryNodeEnumerator
+    . hw-inventory-node-enumerator.lib
+    systemNodeEnumerator
+    osNodeEnumerator  
+    cpuNodeEnumerator
+    memoryNodeEnumerator
+    drivesNodeEnumerator
+    networkNodesEnumerator
   echo "</hwinventory>"
-
   # Hardware node
   echo "<hardware>"
-  hardwareNodeEnumerator
+    . hardware-node-enumerator.lib
+    mainNodeEnumerator
   echo "</hardware>"
 }
-
-
 # 0-A) read actual OS only once
 OS=`uname`
-
 # 0-B) read args:
 while getopts "o:d" opt; do
   case $opt in
@@ -51,28 +49,16 @@ while getopts "o:d" opt; do
       ;;
   esac
 done
-
 # 0-C) export OS variable to all scripts
 export OS=$OS
-
 # 1- Change Directory to file locations so that we can reference other scripts
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $dir
-
-fileMachineInventoryXml="machine-inventory.xml"
 errorLogFile="error.log"
-
-# 2- Reference xml helpers and nodes enumerator
-. xml-helper.sh
-
-# 3- Prepare error log
+# 2- Prepare error log
 echo -e "Running Script '${BASH_SOURCE[0]}' at '`date`'" >$errorLogFile
-
-# 4- Generate XML Output to file and errors to error log
+# 3- Generate XML Output to file and errors to error log
+fileMachineInventoryXml="machine-inventory.xml"
 xmlOutput 1> $fileMachineInventoryXml 2>>$errorLogFile
-
-# (Commented out)5- Print xml to standard output (stdou)
-#cat $fileMachineInventoryXml 
-
-# 6- Change directory back to origional location
+# 4- Change directory back to origional location
 cd - 1>/dev/null

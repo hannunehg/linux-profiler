@@ -10951,7 +10951,7 @@
     <node>3</node>
     <item><![CDATA[CPU0]]></item>
     <attribute><![CDATA[Speed]]></attribute>
-    <value><![CDATA[1200.000]]></value>
+    <value><![CDATA[1800.000]]></value>
 </record>
 <record>
     <node>3</node>
@@ -11209,7 +11209,7 @@
     <node>5</node>
     <item><![CDATA[/dev/sda5]]></item>
     <attribute><![CDATA[Free Space (Gib)]]></attribute>
-    <value><![CDATA[39.7124]]></value>
+    <value><![CDATA[39.7997]]></value>
 </record>
 <record>
     <node>5</node>

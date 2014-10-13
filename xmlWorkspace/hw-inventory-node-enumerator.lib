@@ -1,6 +1,6 @@
 #!/bin/bash
 . common-hardware-extraction-functions.lib
-
+. common-auxiliary-functions.lib
 #--------------------------- Parent Nodes functions ---------------------------#
 function systemNodeEnumerator() {
   #1
@@ -135,7 +135,6 @@ function networkNodesEnumerator() {
 }
 
 #----------------------Hw Inventory Info Functions-----------------------------#
-
 function ubuntuCpuNodeAwkScript() {
   echo "node=$cpuNodeNumber"
   cat /proc/cpuinfo|     
@@ -190,95 +189,7 @@ function ubuntuMemoryNodeAwkScript() {
     '
 }
 
-function ubuntuDrivesNodeEnumerator() {
-  echo "node=$drivesNodeNumber"
 
-  cat $hardwareInfo | 
-  awk -F ": " '
-  BEGIN{
-  nodesFound=0;
-
-  nodeType=0;
-  found=0;
-  iType="SCSI";
-
-  }
-  function printCdRomInfo() {
-    print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; "; 
-    vendor=""; product="";
-    diskNum++;
-  }
-  function printDiskInfo() {
-    print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
-    print "item=\""diskNum"\" attribute=\"Interface Type\" value=\""iType"\" generateHwInventoryXmlRecord; ";
-    print "item=\""diskNum"\" attribute=\"Size\" value=\""size"\" generateHwInventoryXmlRecord; ";
-    vendor=""; product="";size="";
-    diskNum++;
-  }
-  function printOtherInfo() { 
-    freeSpace="`sudo df -k -P "name" | awk '"'"'NR==2{print $4/(1024*1024)}'"'"'`";
-    size="`sudo df -k -P "name" | awk '"'"'NR==2{print $2/(1024*1024)}'"'"'`";
-    
-    print "item=\""name"\" attribute=\"Partition Size (Gib)\" value=\""size"\" generateHwInventoryXmlRecord; ";
-    print "item=\""name"\" attribute=\"Free Space (Gib)\" value=\""freeSpace"\" generateHwInventoryXmlRecord; ";
-    print "item=\""name"\" attribute=\"Volume Name\" value=\""logicalName"\" generateHwInventoryXmlRecord; ";
-    print "item=\""name"\" attribute=\"Volume Serial Number\" value=\""serial"\" generateHwInventoryXmlRecord; ";
-    print "item=\""name"\" attribute=\"File System\" value=\""description"\" generateHwInventoryXmlRecord; ";
-    
-    size = ""; freeSpace="";capacity= "";
-    name="";serial="";description="";
-    diskNum++;
-  }
-  
-  function printPrevious() {
-    if (nodesFound > 0) {
-      #debug
-      #print "type: "nodeType".Prev name: "name" "$0;
-      if (nodeType == 0) {
-        printOtherInfo();
-      }
-      if (nodeType == 1) {
-        printCdRomInfo();
-      } 
-      if (nodeType == 2) {
-        printDiskInfo();
-      }
-      name="";
-    }
-  }
-
-  #### MAIN FLOW BELOW ####
-  /\*-scsi/{ found=index($0, "-");nodeType=-1;next;}
-  
-  (found == 0){ next; }
-  
-  /\*-/{
-    current=index($0, "-");
-    if ( current <= found) {
-      found = 0;
-    }
-    printPrevious();
-    
-    nodeType=0; 
-    if ( $0 ~ "cdrom"){ nodeType=1;}
-    if ( $0 ~ "disk"){ nodeType=2;}
-    if ( $0 ~ "scsi"){nodeType=-1;}
-    
-    
-    name="";
-    nodesFound++;
-    next;
-  }
-  /description:/{description=$2} 
-  /product:/{product=$2}
-  /vendor:/{vendor=$2} 
-  /bus info:/{bus=$2} 
-  /logical name:/{ if (name == "") {name=$2 } logicalName=$2;}
-  /serial:/{serial=$2} 
-  /size:/{size=$2} 
-  /capacity:/{capacity=$2}
-  '
-}
 
 function ubuntuNetworkNodesEnumerator() {
 
