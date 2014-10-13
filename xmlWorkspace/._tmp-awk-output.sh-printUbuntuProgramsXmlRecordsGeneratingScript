@@ -1,5 +1,5 @@
 #!/bin/bash
-. programs-node-enumerator.lib
+. common-auxiliary-functions.lib
 displayname="account-plugin-aim";
 displayversion="3.8.6-0ubuntu9";
 publisher="Debian Telepathy maintainers <pkg-telepathy-maintainers@lists.alioth.debian.org>"; 

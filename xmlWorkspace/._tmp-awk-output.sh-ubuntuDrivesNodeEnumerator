@@ -1,5 +1,5 @@
 #!/bin/bash
-. common-hardware-extraction-functions.lib
+. common-auxiliary-functions.lib
 node=5
 item="" attribute="Model" value="Optiarc DVD RW AD-7200S" generateHwInventoryXmlRecord; 
 item="1" attribute="Model" value="Western Digital WDC WD1600AAJS-6" generateHwInventoryXmlRecord; 

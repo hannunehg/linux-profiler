@@ -1,5 +1,5 @@
 #!/bin/bash
-. common-hardware-extraction-functions.lib
+. common-auxiliary-functions.lib
 node=4
 item="DIMM0" attribute="Size" value="1073741824" generateHwInventoryXmlRecord; 
 item="DIMM0" attribute="Speed" value="667 MHz" generateHwInventoryXmlRecord; 
