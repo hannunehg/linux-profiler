@@ -4,7 +4,7 @@
 thisScriptName=$(basename ${BASH_SOURCE[0]})
 . common-auxiliary-functions.lib
 
-function mainNodeEnumerator() {
+function programsNodeEnumerator() {
   case $OS in
     Linux)
       awkScriptMaker ubuntuProgramsNodeEnumerator

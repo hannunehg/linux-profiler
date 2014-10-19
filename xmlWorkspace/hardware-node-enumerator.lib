@@ -17,7 +17,7 @@
 . common-hardware-extraction-functions.lib
 . common-auxiliary-functions.lib
 
-function mainNodeEnumerator() {
+function hardwareNodeEnumerator() {
   manufacturer=$(manufacturerNode)
   version=$(versionNode)
   product=$(productNode)
@@ -90,9 +90,10 @@ function diskdrivesNode() {
     awk -F "[\[\]]" '
     (value == "Model"){model=$3;} 
     (value == "Interface Type"){iType=$3;}  
-    (value == "Size"){size=$3} {value=$3;} 
-    (model != "") && (iType != "") &&(size != "") {
-    print model" ["size" "iType"];"; model=""; iType=""; size="";
+    (value == "Size"){size=$3} 
+    {value=$3;} 
+    (model != "") && (size != "") {
+      print model" ["size" "iType"];"; model=""; iType=""; size="";
     }'
 }
 

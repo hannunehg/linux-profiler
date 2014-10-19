@@ -6,6 +6,7 @@
 BEGIN {
 _diskNum=1;
 _printType=-1;
+ OFMT = "%.3f";
 }
 # overriden in this file
 function printAll(){
@@ -30,8 +31,12 @@ function printDiskInfo() {
 }
 function printVolumeInfo() {
   printXml(name,"Volume Name",logicalName);
-  printXml(name,"Partition Size",size);
-  printXml(name,"Free Space",freeSpace);
+  if (size != "") {
+    printXml(name,"Partition Size",size);
+  }
+  if (freeSpace != "") {
+    printXml(name,"Free Space",freeSpace);
+  }
   printXml(name,"Volume Serial Number",serial);
   printXml(name,"File System",fileSystem);    
   logicalName="";size="";freeSpace="";serial="";fileSystem="";
@@ -60,7 +65,7 @@ function printVolumeInfo() {
     if (LEAF_KEY == "bsd_name") {
       logicalName=LEAF_VALUE;
     }
-    if (LEAF_KEY == "free_space_in_bytes") {
+    if (LEAF_KEY == "free_space") {
       freeSpace=LEAF_VALUE;
     }
     if (LEAF_KEY == "volume_uuid") {
@@ -71,7 +76,7 @@ function printVolumeInfo() {
     }
   }
   # Common between Nodes
-  if (LEAF_KEY == "size_in_bytes") {
+  if (LEAF_KEY == "size") {
       size=LEAF_VALUE;
   }
   
