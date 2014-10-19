@@ -54,7 +54,7 @@ function darwinProgramsNodeEnumerator() {
       print "installlocation=\""installlocation"\"; "
       print "urlinfoabout=\""urlinfoabout"\"; "
       print "contact=\""contact"\"; "
-      print "generateProgramsXmlRecord"   
+      print "generateProgramsXmlRecord;"
       displayname=""; displayversion=""; publisher="";urlinfoabout="";
       comments=""; contact=""; installdate=""; installlocation="";
     }

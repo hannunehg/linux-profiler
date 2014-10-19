@@ -1,3 +1,5 @@
 #!/bin/bash
-. programs-node-enumerator.lib
-awkScriptMaker darwinProgramsNodeEnumerator
+
+. common-hardware-extraction-functions.lib
+
+awkScriptMaker darwinDrivesNodeEnumerator
