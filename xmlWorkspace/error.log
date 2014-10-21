@@ -1,12 +1,1 @@
-Running Script './machine-inventory.sh' at 'Tue Oct 21 15:15:55 EET 2014'
-Unsupported OS: Darwin
-./._tmp-awk-output.sh-macMemoryNodeAwkScript: line 14: BANK: command not found
-./._tmp-awk-output.sh-macMemoryNodeAwkScript: line 25: BANK: command not found
-./._tmp-awk-output.sh-macMemoryNodeAwkScript: line 31: global_name: command not found
-./._tmp-awk-output.sh-darwinDrivesNodeEnumerator: line 10: APPLE: command not found
-./._tmp-awk-output.sh-darwinDrivesNodeEnumerator: line 45: HL-DT-ST: command not found
-./._tmp-awk-output.sh-darwinDrivesNodeEnumerator: line 49: Intel: command not found
-Unsupported OS: Darwin
-./._tmp-awk-output.sh-darwinDrivesNodeEnumerator: line 10: APPLE: command not found
-./._tmp-awk-output.sh-darwinDrivesNodeEnumerator: line 45: HL-DT-ST: command not found
-./._tmp-awk-output.sh-darwinDrivesNodeEnumerator: line 49: Intel: command not found
+Running Script './machine-inventory.sh' at 'Tue Oct 21 17:08:05 EET 2014'

@@ -8,6 +8,7 @@ BEGIN {
 _diskNum=1;
 _printType=-1;
 _networkDev=1;
+#times=0;
  OFMT = "%.3f";
 }
 # inherited function overriden in this file
@@ -15,6 +16,7 @@ function printTopLevel() {
   if (_printType == 4) {
     printNetworkInfo();
   }
+  #print "echo "times++;
 }
 # inherited function overriden in this file
 function printAll(){
@@ -36,10 +38,10 @@ function printAll(){
   #print "testting Open Tags: "_dictOpenTags;
 }
 function printCpuInfo() {
-  printXml(procId,"Manufacturer",cpuManufacturer);  
-  printXml(procId,"Name",cpuModelName);
-  printXml(procId,"Version",cpuVersion);
-  printXml(procId,"Speed",cpuSpeed);
+  printXml("CPU","Manufacturer",cpuManufacturer);  
+  printXml("CPU","Name",cpuModelName);
+  printXml("CPU","Version",cpuVersion);
+  printXml("CPU","Speed",cpuSpeed);
   
 }
 function printNetworkInfo() {
@@ -52,16 +54,18 @@ function printNetworkInfo() {
   printXml(_networkDev,"DHCP Server",dhcp);    
   printXml(_networkDev,"DNS Servers",dns); 
   
-  if (macAddress != ""){ _networkDev++;}
+  if (model !=""){ _networkDev++;model="";}
   macAddress="";ipAddress="";gateway="";
   dnsDomain="";dhcp="";dns="";
 }
 function printMemoryInfo() {
-  printXml(name,"Size",dimmSize);
-  printXml(name,"Speed",dimmSpeed);
-  printXml(name,"Form Factor",formFactor);
-  printXml(name,"Bank Label","`echo \""name"\" | grep bank[[:space:]][0-9]* -io`");
-  printXml(name,"Memory Type",dimType);  
+  if ( (dimmSize*1 > 0) && ( name ~ "DIMM") ){
+    printXml(name,"Size",dimmSize);
+    printXml(name,"Speed",dimmSpeed);
+    printXml(name,"Form Factor",formFactor);
+    printXml(name,"Bank Label","`echo \""name"\" | grep bank[[:space:]][0-9]* -io`");
+    printXml(name,"Memory Type",dimType);  
+  }
   dimmSize="";dimmSpeed="";formFactor="";name="";dimType="";
 }
 function printDiskInfo() {
@@ -72,6 +76,8 @@ function printDiskInfo() {
   _diskNum++;
 }
 function printVolumeInfo() {
+  if (_dictOpenTags < 3) { return;}
+
   printXml(name,"Volume Name",logicalName);
   if (size != "") {
     printXml(name,"Partition Size",size);
@@ -97,7 +103,6 @@ function printVolumeInfo() {
     # common
     if (LEAF_KEY == "_name") {        
       name=LEAF_VALUE;
-      print name
     }
     # Disks Node
     if (LEAF_KEY == "device_model") {
@@ -164,15 +169,20 @@ function printVolumeInfo() {
     gateway=LEAF_VALUE;
     LEAF_KEY="";
   }
+  if (LEAF_KEY == "_name") {
+    model=LEAF_VALUE;
+  }
+  
   # CPU Node
-  #cpuManufacturer
+  if (LEAF_KEY == "platform_cpu_vendor") {
+    cpuManufacturer=LEAF_VALUE;
+  }
   if (LEAF_KEY == "cpu_type") {
     cpuModelName=LEAF_VALUE;
   }
   if (LEAF_KEY == "current_processor_speed") {
     cpuSpeed=LEAF_VALUE;
   }
- 
   # Common between all Nodes
   if (LEAF_KEY == "size") {
       size=LEAF_VALUE;

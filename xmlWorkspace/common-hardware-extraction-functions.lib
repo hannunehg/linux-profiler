@@ -124,7 +124,7 @@ function physicalmemoryNode() {
       system_profiler -xml SPMemoryDataType	| awk -F "[<>]" '
         /dimm_size/{found=1; next }
         (found ==1) && ($2 == "string"){ 
-          if ($3 != "") { size = size + $3};  
+          if ( ($3 != "") && ($3 != "empty")) { size = size + $3};  
           split($3, a, " ");
         }
         found = 0; 

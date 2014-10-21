@@ -7,5 +7,6 @@ export OS="Darwin"
 #awkScriptMaker macCpuNodeAwkScript
 #osTypeNode
 #osVersionNode
-#physicalmemoryNode
 networkadaptersNode
+#networkInfoXml
+

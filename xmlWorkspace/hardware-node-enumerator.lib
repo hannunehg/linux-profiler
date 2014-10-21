@@ -56,9 +56,10 @@ function productNode() {
 function osNode() {
   case $OS in
     Linux)
-    	uname -osrv;;
+    	uname -osrv
+    	;;
     Darwin)
-      #TODO test on real machine
+      uname -v
       ;;	
     *)		
       echo "Unsupported OS: $OS" >&2;;
@@ -183,13 +184,17 @@ function networkadaptersNode() {
     Darwin)
       networkInfoXml |  
         awk -F "[\[\]]" '
-        BEGIN{ ORS="; "} 
-        (value == "MAC Address") {
-          macAddress=$3;
-          print model" ["macAddress"]["ipAddress"]";
-          ipAddress="";macAddress="";
-        } 
+        BEGIN{ ORS="; "; previous=1;} 
+        (value == "MAC Address") { macAddress=$3; } 
         (value == "IP Addresses"){ipAddress=$3;}  
+        (value == "Model") { model=$3; } 
+        ( $1 ~ "item"){
+          if ( ( $3*1 > previous*1) && (macAddress != "")) {
+            print model" ["macAddress"]["ipAddress"]";
+            ipAddress="";macAddress="";model="";
+          }
+          previous=$3;      
+        }  
         {value=$3;}
         '
       ;;

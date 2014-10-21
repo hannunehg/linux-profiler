@@ -44,7 +44,7 @@ _keyFound=0;
   _dictOpenTags--;
 }
 
-(_dictOpenTags == 2) {
+(_dictOpenTags == 1) {
   printTopLevel();
 }
 

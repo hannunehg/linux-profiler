@@ -118,6 +118,14 @@ function memoryNodeEnumerator() {
       ;;
     Darwin)
       awkScriptMaker macMemoryNodeAwkScript
+      item="Physical"
+      attribute="Total"
+      value=$(physicalmemoryNode)
+      generateHwInventoryXmlRecord
+      item="Visible"
+      attribute="Total"
+      value=$(visiblememoryNode)
+      generateHwInventoryXmlRecord
       ;;
     *)	
       echo "Unsupported OS: $OS" >&2;;
