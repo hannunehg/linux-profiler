@@ -4385,8 +4385,26 @@
 <record>
     <node>1</node>
     <item><![CDATA[Motherboard]]></item>
+    <attribute><![CDATA[BIOS]]></attribute>
+    <value><![CDATA[MBP91.00D3.B09]]></value>
+</record>
+<record>
+    <node>1</node>
+    <item><![CDATA[Display Adapter]]></item>
+    <attribute><![CDATA[Model]]></attribute>
+    <value><![CDATA[kHW_IntelHD4000Item; ]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
+    <attribute><![CDATA[Type]]></attribute>
+    <value><![CDATA[OS X 10.9.5 (13F34)]]></value>
+</record>
+<record>
+    <node>2</node>
+    <item><![CDATA[Operating System]]></item>
     <attribute><![CDATA[Version]]></attribute>
-    <value><![CDATA[1.01]]></value>
+    <value><![CDATA[Darwin 13.4.0]]></value>
 </record>
 <record>
     <node>2</node>
@@ -4395,87 +4413,220 @@
     <value><![CDATA[x86_64]]></value>
 </record>
 <record>
-    <node></node>
-    <item><![CDATA[1]]></item>
+    <node>3</node>
+    <item></item>
+    <attribute><![CDATA[Name]]></attribute>
+    <value><![CDATA[Intel Core i5]]></value>
+</record>
+<record>
+    <node>3</node>
+    <item></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[2.5 GHz]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item></item>
+    <attribute><![CDATA[Form Factor]]></attribute>
+    <value><![CDATA[DIMM]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 0/DIMM0]]></item>
+    <attribute><![CDATA[Size]]></attribute>
+    <value><![CDATA[2 GB]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 0/DIMM0]]></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[1600 MHz]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 0/DIMM0]]></item>
+    <attribute><![CDATA[Form Factor]]></attribute>
+    <value><![CDATA[DIMM]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 0/DIMM0]]></item>
+    <attribute><![CDATA[Bank Label]]></attribute>
+    <value><![CDATA[BANK 0]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 1/DIMM0]]></item>
+    <attribute><![CDATA[Size]]></attribute>
+    <value><![CDATA[2 GB]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 1/DIMM0]]></item>
+    <attribute><![CDATA[Speed]]></attribute>
+    <value><![CDATA[1600 MHz]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 1/DIMM0]]></item>
+    <attribute><![CDATA[Form Factor]]></attribute>
+    <value><![CDATA[DIMM]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 1/DIMM0]]></item>
+    <attribute><![CDATA[Bank Label]]></attribute>
+    <value><![CDATA[BANK 1]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[BANK 1/DIMM0]]></item>
+    <attribute><![CDATA[Memory Type]]></attribute>
+    <value><![CDATA[DDR3]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[global_name]]></item>
+    <attribute><![CDATA[Form Factor]]></attribute>
+    <value><![CDATA[DIMM]]></value>
+</record>
+<record>
+    <node>4</node>
+    <item><![CDATA[global_name]]></item>
+    <attribute><![CDATA[Memory Type]]></attribute>
+    <value><![CDATA[DDR3]]></value>
+</record>
+<record>
+    <node>5</node>
+    <item><![CDATA[3]]></item>
     <attribute><![CDATA[Model]]></attribute>
     <value><![CDATA[APPLE HDD HTS545050A7E362               ]]></value>
 </record>
 <record>
-    <node></node>
-    <item><![CDATA[1]]></item>
+    <node>5</node>
+    <item><![CDATA[3]]></item>
     <attribute><![CDATA[Size]]></attribute>
     <value><![CDATA[500.11 GB]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[EFI]]></item>
     <attribute><![CDATA[Volume Name]]></attribute>
     <value><![CDATA[disk0s1]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[EFI]]></item>
     <attribute><![CDATA[Partition Size]]></attribute>
     <value><![CDATA[209.7 MB]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[Macintosh HD]]></item>
     <attribute><![CDATA[Volume Name]]></attribute>
     <value><![CDATA[disk0s2]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[Macintosh HD]]></item>
     <attribute><![CDATA[Partition Size]]></attribute>
     <value><![CDATA[499.25 GB]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[Macintosh HD]]></item>
     <attribute><![CDATA[Free Space]]></attribute>
     <value><![CDATA[397.21 GB]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[Macintosh HD]]></item>
     <attribute><![CDATA[Volume Serial Number]]></attribute>
     <value><![CDATA[C8592F60-B824-3A81-9229-74B53FFF5BDA]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[Macintosh HD]]></item>
     <attribute><![CDATA[File System]]></attribute>
     <value><![CDATA[Journaled HFS+]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[Recovery HD]]></item>
     <attribute><![CDATA[Volume Name]]></attribute>
     <value><![CDATA[disk0s3]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[Recovery HD]]></item>
     <attribute><![CDATA[Partition Size]]></attribute>
     <value><![CDATA[650 MB]]></value>
 </record>
 <record>
-    <node></node>
+    <node>5</node>
     <item><![CDATA[Intel 7 Series Chipset]]></item>
     <attribute><![CDATA[Volume Serial Number]]></attribute>
     <value><![CDATA[32EA5F15-83E4-3E6E-BCAB-2CCC29F94FD2]]></value>
 </record>
 <record>
-    <node></node>
+    <node>6</node>
+    <item><![CDATA[1]]></item>
+    <attribute><![CDATA[MAC Address]]></attribute>
+    <value><![CDATA[68:5b:35:93:2b:4c]]></value>
+</record>
+<record>
+    <node>6</node>
     <item><![CDATA[2]]></item>
-    <attribute><![CDATA[Model]]></attribute>
-    <value><![CDATA[HL-DT-ST DVDRW  GS41N                   ]]></value>
+    <attribute><![CDATA[Default Gateway]]></attribute>
+    <value><![CDATA[10.10.10.1]]></value>
+</record>
+<record>
+    <node>6</node>
+    <item><![CDATA[2]]></item>
+    <attribute><![CDATA[DNS Domain]]></attribute>
+    <value><![CDATA[asaltech.com]]></value>
+</record>
+<record>
+    <node>6</node>
+    <item><![CDATA[2]]></item>
+    <attribute><![CDATA[DHCP Server]]></attribute>
+    <value><![CDATA[10.10.10.1]]></value>
+</record>
+<record>
+    <node>6</node>
+    <item><![CDATA[2]]></item>
+    <attribute><![CDATA[DNS Servers]]></attribute>
+    <value><![CDATA[172.22.1.70,172.22.1.15]]></value>
+</record>
+<record>
+    <node>6</node>
+    <item><![CDATA[2]]></item>
+    <attribute><![CDATA[IP Addresses]]></attribute>
+    <value><![CDATA[10.10.10.29]]></value>
+</record>
+<record>
+    <node>6</node>
+    <item><![CDATA[2]]></item>
+    <attribute><![CDATA[MAC Address]]></attribute>
+    <value><![CDATA[44:fb:42:ff:fe:bc:5e:82]]></value>
+</record>
+<record>
+    <node>6</node>
+    <item><![CDATA[3]]></item>
+    <attribute><![CDATA[MAC Address]]></attribute>
+    <value><![CDATA[a8:86:dd:8c:85:aa]]></value>
 </record>
 </hwinventory>
 <hardware>
 <record>
-    <version>1.01</version>
+    <bios>MBP91.00D3.B09</bios>
+    <processors>2x Intel Core i5 @ 2.5 GHz</processors>
+    <physicalmemory>4 GB</physicalmemory>
+    <physicalmemorydet>[BANK 0/DIMM0] 2097152/1600 MHz; [BANK 1/DIMM0] 2097152/1600 MHz; </physicalmemorydet>
+    <visiblememory>4 GB</visiblememory>
+    <displayadapters>kHW_IntelHD4000Item; </displayadapters>
+    <networkadapters> [68:5b:35:93:2b:4c][];  [44:fb:42:ff:fe:bc:5e:82][10.10.10.29];  [a8:86:dd:8c:85:aa][]; </networkadapters>
     <diskdrives>APPLE HDD HTS545050A7E362                [500.11 GB ];</diskdrives>
+    <cdromdrives>HL-DT-ST DVDRW  GS41N</cdromdrives>
 </record>
 </hardware>

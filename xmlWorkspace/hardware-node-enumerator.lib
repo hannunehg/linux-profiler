@@ -43,7 +43,12 @@ function productNode() {
   case $OS in
     Linux)
     	sudo dmidecode -t 2 | awk -F ": " '(NR == 7){ print $2 }';;
-    	
+    Darwin)
+    system_profiler -xml SPHardwareDataType	| awk -F "[<>]" '
+        /platform_product_name/{found=1; next }
+        (found ==1){if ($3 != "") print $3}
+         found = 0;'
+      ;;	
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac 
@@ -52,22 +57,37 @@ function osNode() {
   case $OS in
     Linux)
     	uname -osrv;;
-    	
+    Darwin)
+      #TODO test on real machine
+      ;;	
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac 
 }
 function processorsNode() {
-  
   case $OS in
     Linux)
     	cat /proc/cpuinfo|
         awk -F ": " '/model name/{ print $2}'| head -n 1;;	
+    Darwin)
+      system_profiler -xml SPHardwareDataType	| awk -F "[<>]" '
+        /number_processors/{nfound=1; next }
+        (nfound ==1){if ($3 != "") procNum=$3}nfound = 0;
+        /current_processor_speed/{sfound=1; next }
+        (sfound ==1){if ($3 != "") speed=$3}sfound = 0;
+        /cpu_type/{tfound=1; next }
+        (tfound ==1){if ($3 != "") type=$3}tfound = 0;
+        ($2 == "/dict"){
+          if ( (type !="") ||  (speed !="") || (procNum!="") ){
+            print procNum"x "type" @ "speed; 
+            type="";speed="";procNum="";
+          }
+        }'
+       ;;
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac 
 }
-
 function physicalmemorydetNode() {
   case $OS in
     Linux)
@@ -79,7 +99,27 @@ function physicalmemorydetNode() {
     	  (found !=0) && (NR == found ){ dimNum=$2 } 
     	  (found!=0) && (NR == found + 4){ 
     	    print "["dimNum"] " mSize*1024*1024"/"$2
-    	  }';;	
+    	  }';;
+    Darwin)	  
+      system_profiler -xml SPMemoryDataType |	
+        awk -F "[<>]" '
+        BEGIN{ OFMT = "%.0f"; mSize=0; dimNum=""; ORS="; "}
+        /_name/{ nameFound =1; next } 
+        (nameFound == 1){
+          nameFound = 0; 
+          if ($3 ~ /DIMM/) { 
+            dimNum=$3
+          }
+        }
+        /dimm_size/{ sizeFound=1;next}
+        (sizeFound == 1){ sizeFound=0; mSize=$3;}
+        /dimm_speed/ { speedFound=1;next}
+        (speedFound == 1){ speedFound=0; mSpeed=$3}
+        /dict/ && (dimNum != "") {
+          print "["dimNum"] " mSize*1024*1024"/"mSpeed;
+          dimNum="";mSize=0;mSpeed="";
+        }
+        ';;
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac
@@ -96,7 +136,25 @@ function diskdrivesNode() {
       print model" ["size" "iType"];"; model=""; iType=""; size="";
     }'
 }
-
+function cdromdrivesNode() {
+  case $OS in
+    Linux)
+  	  sudo cat $hardwareInfo | 
+  	    awk -F ": " '/\*-/{found=0} 
+  	      /\*-cdrom/{found=1} (found == 1) {print $0} ' | 
+  	      awk -F ": " '
+  	      /description/{description=$2} 
+  	      /product/{product=$2}/vendor/{vendor=$2} 
+  	      END{print vendor" "description" "product}';;	
+    Darwin)
+      system_profiler -xml SPDiscBurningDataType | 
+        awk -F "[<>]" '
+        /_name/{ found =1; next } 
+        (found == 1){found = 0; if ($3 != "") { print $3} } ';; 
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
 function networkadaptersNode() {
   case $OS in
     Linux)
@@ -122,33 +180,28 @@ function networkadaptersNode() {
           cmd | getline ipFour
         }'
   	  ;;	
+    Darwin)
+      networkInfoXml |  
+        awk -F "[\[\]]" '
+        BEGIN{ ORS="; "} 
+        (value == "MAC Address") {
+          macAddress=$3;
+          print model" ["macAddress"]["ipAddress"]";
+          ipAddress="";macAddress="";
+        } 
+        (value == "IP Addresses"){ipAddress=$3;}  
+        {value=$3;}
+        '
+      ;;
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac
 }
-
-function cdromdrivesNode() {
-  case $OS in
-    Linux)
-    	  sudo cat $hardwareInfo | 
-    	    awk -F ": " '/\*-/{found=0} 
-    	      /\*-cdrom/{found=1} (found == 1) {print $0} ' | 
-    	      awk -F ": " '
-    	      /description/{description=$2} 
-    	      /product/{product=$2}/vendor/{vendor=$2} 
-    	      END{print vendor" "description" "product}';;	
-    *)		
-      echo "Unsupported OS: $OS" >&2;;
-  esac
-}
-
-#TODO: now we print only 0 as linux Operating systems do not have this property
+#not found in Linux
 function domainroleNode() {
   case $OS in
-    Linux)
-    	 echo 0;;	
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$nullMsg"
+    ;;
   esac
 }
-
