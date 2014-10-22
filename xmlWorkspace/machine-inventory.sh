@@ -48,19 +48,18 @@ while getopts "o:d" opt; do
 done
 # 0-C) export OS variable to all scripts
 export OS=$OS
-# 0-D) Reference needed libraries
-. programs-node-enumerator.lib
-. hw-inventory-node-enumerator.lib
-. hardware-node-enumerator.lib
-
 # 1- Change Directory to file locations so that we can reference other scripts
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $dir
+# 2- Reference needed libraries
+. programs-node-enumerator.lib
+. hw-inventory-node-enumerator.lib
+. hardware-node-enumerator.lib
+# 3- Prepare error log
 errorLogFile="error.log"
-# 2- Prepare error log
 echo -e "Running Script '${BASH_SOURCE[0]}' at '`date`'" >$errorLogFile
-# 3- Generate XML Output to file and errors to error log
+# 4- Generate XML Output to file and errors to error log
 fileMachineInventoryXml="machine-inventory.xml"
 xmlOutput 1> $fileMachineInventoryXml 2>>$errorLogFile
-# 4- Change directory back to origional location
+# 5- Change directory back to origional location
 cd - 1>/dev/null
