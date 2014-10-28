@@ -95,7 +95,6 @@ then
 fi
 echo -e "</record>"
 }
-
 #---------------------Programs Node XML Record Formatter-----------------------#
 function generateProgramsXmlRecord() {
   echo -e "<record>"
@@ -133,15 +132,17 @@ function generateProgramsXmlRecord() {
   fi
   echo -e "</record>" 
 }
-
-
 #------------------------------Auxiliary Functions-----------------------------#
+# receive only one parameter with the name of the function to pass to 
+# executePassedAwk function
 function awkScriptMaker() {
   tmpAwkOutputScript="._tmp-awk-output.sh-$1"
   executePassedAwk $1 > $tmpAwkOutputScript
   sudo chmod +x $tmpAwkOutputScript  
   ./$tmpAwkOutputScript
 }
+# receive only one parameter with the name of the awk function that is to 
+# generate content of a script 
 function executePassedAwk() {
   echo "#!/bin/bash"
   echo ". $thisScriptName"

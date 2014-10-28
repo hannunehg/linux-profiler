@@ -1,15 +1,10 @@
 #!/bin/bash
-#
 # Convention Notes:
 # CAPITALIZED: global variable
-
-# Main Xml Format
 function xmlOutput() {
-  # Software node
   echo "<programs>"
     programsNodeEnumerator
   echo "</programs>"
-  # Hw Inventory node
   echo "<hwinventory>"
     systemNodeEnumerator
     osNodeEnumerator  
@@ -18,7 +13,6 @@ function xmlOutput() {
     drivesNodeEnumerator
     networkNodesEnumerator
   echo "</hwinventory>"
-  # Hardware node
   echo "<hardware>"
     hardwareNodeEnumerator
   echo "</hardware>"

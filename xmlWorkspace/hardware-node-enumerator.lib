@@ -1,22 +1,18 @@
 #!/bin/bash
-# Each nod we fill in xmls is OS dependent, hence we put each command we use 
-# in a function so that we could add each OS's relevant command
-# 
-# Example to add multi OS command:
+# Each node we fill in xmls is OS dependent, hence we put each command we use 
+# in a function so that we could add each OS's relevant command. Example:
 # function osDependentFunction() {
 #  OS=`uname`
 #  case $OS in
 #    Linux)
-#     echo "called from Linux OS";;
+#      echo "called from Ubuntu";;
 #    Darwin)
-#     echo "called from Linux Mac OS";;	
+#      echo "called from Mac";;	
 #    *)		
 #      echo "Unsupported OS: $OS" >&2;;
 #  esac 
-# 
 . common-hardware-extraction-functions.lib
 . common-auxiliary-functions.lib
-
 function hardwareNodeEnumerator() {
   manufacturer=$(manufacturerNode)
   version=$(versionNode)
@@ -36,8 +32,7 @@ function hardwareNodeEnumerator() {
   chassis=$(chassisNode)
   domainrole=$(domainroleNode)
   generateHardwareXmlRecord
-}
-  
+} 
 #---------------------------Hardware Node Functions----------------------------#
 function productNode() {
   case $OS in
@@ -92,7 +87,7 @@ function processorsNode() {
 function physicalmemorydetNode() {
   case $OS in
     Linux)
-    	 sudo dmidecode memory | 
+      sudo dmidecode memory | 
     	  awk -v "found=0" '
     	  BEGIN{ OFMT = "%.0f"; mSize=0; dimNum=0; ORS="; "} 
     	  /Size/{mSize=$2;} 
@@ -123,8 +118,7 @@ function physicalmemorydetNode() {
         ';;
     *)		
       echo "Unsupported OS: $OS" >&2;;
-  esac
-  
+  esac 
 }
 function diskdrivesNode() {
   drivesInfoXml |  
@@ -202,7 +196,7 @@ function networkadaptersNode() {
       echo "Unsupported OS: $OS" >&2;;
   esac
 }
-#not found in Linux
+#not found in Linux (forward compatibility)
 function domainroleNode() {
   case $OS in
     *)		
