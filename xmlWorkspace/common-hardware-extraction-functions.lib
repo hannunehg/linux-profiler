@@ -64,9 +64,11 @@ function serialnumberNode() {
     Linux)
     	sudo dmidecode -t 2 | awk -F ": " '(NR == 9){ print $2 }';;
     Darwin)
-       #TODO it seems we can't get motherboard info from system profiler. 
-       # investigate more
-       ;;
+       system_profiler -xml SPHardwareDataType | 
+        awk -F "[<>]" '
+        /serial/{found=1; next }
+        (found ==1){ found = 0; if ($3 != "") { print $3} } 
+        ';;
     *)		
       echo "Unsupported OS: $OS" >&2;;
   esac 
