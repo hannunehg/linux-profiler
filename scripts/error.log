@@ -1,0 +1,5 @@
+Running Script 'scripts/machine-inventory.sh' at 'Sun Nov 16 09:53:19 EET 2014'
+Unsupported OS: Darwin
+uname: illegal option -- i
+usage: uname [-amnprsv]
+Unsupported OS: Darwin

@@ -1,0 +1,269 @@
+#!/bin/bash
+. common-hardware-extraction-functions.lib
+. common-auxiliary-functions.lib
+#--------------------------- Parent Nodes functions ---------------------------#
+function systemNodeEnumerator() {
+  #1
+  node=$systemNodeNumber
+  
+  item="Motherboard"
+  attribute="Manufacturer"
+  value=$(manufacturerNode) 
+  generateHwInventoryXmlRecord
+  
+  item="Motherboard"
+  attribute="Version"
+  value=$(versionNode)
+  generateHwInventoryXmlRecord
+
+  item="Motherboard"
+  attribute="Product Number"
+  value=$(partnumberNode)
+  generateHwInventoryXmlRecord  
+  
+  item="Motherboard"
+  attribute="Serial Number"
+  value=$(serialnumberNode)
+  generateHwInventoryXmlRecord 
+  
+  item="Motherboard"
+  attribute="BIOS"
+  value=$(biosNode)
+  generateHwInventoryXmlRecord
+  
+  item="Display Adapter"
+  attribute="Model"
+  value=$(displayadaptersNode)
+  generateHwInventoryXmlRecord
+  
+  item="Enclosure"
+  attribute="Chassis"
+  value=$(chassisNode)
+  generateHwInventoryXmlRecord
+}
+
+function osNodeEnumerator() {
+  #2
+  node=$osNodeNumber
+
+  item="Operating System"  
+  attribute="Manufacturer"
+  value=$(osManufacturerNode)
+  generateHwInventoryXmlRecord
+  
+  item="Operating System"
+  attribute="Type"
+  value=$(osTypeNode)
+  generateHwInventoryXmlRecord
+  
+  item="Operating System"
+  attribute="Version"
+  value=$(osVersionNode)
+  generateHwInventoryXmlRecord
+  
+  # N/A -> this outputs empty value so it is not printed
+  item="Operating System"
+  attribute="Service Pack"
+  value=$(osServicePackNode)
+  generateHwInventoryXmlRecord
+ 
+  item="Operating System"
+  attribute="Install Date"
+  value=$(osInstallDateNode)
+  generateHwInventoryXmlRecord
+  
+  item="Operating System"
+  attribute="Architecture"
+  value=$(osArchitectureNode)
+  generateHwInventoryXmlRecord
+  
+  # N/A -> this outputs empty value so it is not printed
+  item="Operating System"
+  attribute="Role"
+  value=$(osRoleNode)
+  generateHwInventoryXmlRecord
+  
+  # Linux exclusive (no windows match)
+  item="Operating System"
+  attribute="Description"
+  value=$(osDescriptionNode)
+  generateHwInventoryXmlRecord
+}
+
+function cpuNodeEnumerator() {
+  node=$cpuNodeNumber
+  case $OS in
+    Linux)
+      awkScriptMaker ubuntuCpuNodeAwkScript ;;
+    Darwin)
+      awkScriptMaker macCpuNodeAwkScript ;;
+    *)	
+      echo "Unsupported OS: $OS" >&2;;
+  esac	
+}
+
+function memoryNodeEnumerator() {
+  node=$memoryNodesNumber
+  case $OS in
+    Linux)
+      awkScriptMaker ubuntuMemoryNodeAwkScript 
+      item="Physical"
+      attribute="Total"
+      value=$(physicalmemoryNode)
+      generateHwInventoryXmlRecord
+      item="Visible"
+      attribute="Total"
+      value=$(visiblememoryNode)
+      generateHwInventoryXmlRecord
+      ;;
+    Darwin)
+      awkScriptMaker macMemoryNodeAwkScript
+      item="Physical"
+      attribute="Total"
+      value=$(physicalmemoryNode)
+      generateHwInventoryXmlRecord
+      item="Visible"
+      attribute="Total"
+      value=$(visiblememoryNode)
+      generateHwInventoryXmlRecord
+      ;;
+    *)	
+      echo "Unsupported OS: $OS" >&2;;
+  esac	 
+}
+
+function drivesNodeEnumerator() {
+  drivesInfoXml
+}
+
+function networkNodesEnumerator() {
+  networkInfoXml
+}
+
+#----------------------Hw Inventory Info Functions-----------------------------#
+function macCpuNodeAwkScript() {
+  echo "node=$cpuNodeNumber"
+  system_profiler -xml SPHardwareDataType | awk -f common-awk-functions.awk -f macGenericXml.awk
+
+}
+function ubuntuCpuNodeAwkScript() {
+  echo "node=$cpuNodeNumber"
+  cat /proc/cpuinfo|     
+    awk -F ": " '
+    /processor/{
+    procId="CPU"$2
+    }
+    /vendor_id/{ 
+      print "item=\""procId"\" attribute=\"Manufacturer\" value=\""$2"\" generateHwInventoryXmlRecord; ";     
+    }
+    /model/{
+      if ( $1 ~ "model name" ) {
+        print "item=\""procId"\" attribute=\"Name\" value=\""$2"\" generateHwInventoryXmlRecord; "
+      } else {
+        print "item=\""procId"\" attribute=\"Version\" value=\""$2"\" generateHwInventoryXmlRecord; "; 
+      }
+    }
+    /cpu MHz/{
+      print "item=\""procId"\" attribute=\"Speed\" value=\""$2"\" generateHwInventoryXmlRecord; "
+    }
+    '
+}
+function macMemoryNodeAwkScript() {
+  echo "node=$memoryNodesNumber"
+  system_profiler -xml SPMemoryDataType | awk -f common-awk-functions.awk -f macGenericXml.awk
+}
+function ubuntuMemoryNodeAwkScript() {
+  echo "node=$memoryNodesNumber"
+  sudo dmidecode memory | 
+    awk -F ": " '
+    BEGIN{ OFMT = "%.0f"; found=0;mSize=0; freeSlots=0} 
+    /Size: [0-9]/{mSize=$2*1024*1024;} 
+    /Speed/{mSpeed=$2;}
+    /Form Factor/{mFormFactor=$2;if (mSize != 0 ) {found=1; }}
+    /Locator/{ 
+      if ( $1 ~ /Bank Locator/ ) {
+        mBank=$2;
+      } else {
+        dimId=$2;
+      }
+    }
+    /^$/ {   
+      if (found > 0) {
+        if (mSize+0 == 0){ freeSlots++}
+        
+        print "item=\""dimId"\" attribute=\"Size\" value=\""mSize"\" generateHwInventoryXmlRecord; ";
+        print "item=\""dimId"\" attribute=\"Speed\" value=\""mSpeed"\" generateHwInventoryXmlRecord; ";
+        print "item=\""dimId"\" attribute=\"Form Factor\" value=\""mFormFactor"\" generateHwInventoryXmlRecord; ";
+        print "item=\""dimId"\" attribute=\"Bank Label\" value=\""mBank"\" generateHwInventoryXmlRecord; ";
+
+        mSize=0; found = 0;
+      }
+    }
+    END{ print "item=\"Physical\" attribute=\"Free Memory Slots\" value=\""freeSlots"\" generateHwInventoryXmlRecord; "; }
+    '
+}
+function osManufacturerNode() {
+  case $OS in
+    Linux)
+    	 lsb_release -i -s;;	
+    Darwin)
+      #TODO it seems we can't get it from system profiler. investigate more
+      ;;  	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function osTypeNode() {
+  case $OS in
+    Linux)
+    	lsb_release -c -s;;
+    Darwin)
+      system_profiler -xml SPSoftwareDataType	| awk -F "[<>]" '
+        /os_version/{found=1; next }
+        (found ==1){ found = 0; if ($3 != "") { print $3} } 
+        ';;  	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function osVersionNode() {
+  case $OS in
+    Linux)
+    	 lsb_release -r -s;;	
+    Darwin)
+      system_profiler -xml SPSoftwareDataType	| awk -F "[<>]" '
+        /kernel_version/{found=1; next }
+        (found ==1){ found = 0; if ($3 != "") { print $3} } 
+        ';;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+# ubuntu exlusive
+function osDescriptionNode() {
+  case $OS in
+    Linux)
+    	 lsb_release -d -s;;	
+  esac
+}
+function osInstallDateNode() {
+case $OS in
+    Linux)
+    	 ls -ltc /var/log/installer --time-style=long-iso | awk 'NR==2{print$(NF-2)" "$(NF-1)}';;	
+    Darwin)
+     #TODO check /var/log/OSInstall.custom
+     ;;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function osArchitectureNode() {
+  uname -i
+}
+function osServicePackNode() {
+  echo "$nullMsg";
+}
+function osRoleNode() {
+  echo "$nullMsg";
+}
+

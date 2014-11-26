@@ -1,0 +1,212 @@
+#!/bin/bash
+# Each nod we fill in xmls is OS dependent, hence we put each command we use 
+# in a function so that we could add each OS's relevant command
+# 
+# Example to add multi OS command:
+# function osDependentFunction() {
+#  OS=`uname`
+#  case $OS in
+#    Linux)
+#     echo "called from Linux OS";;
+#    Darwin)
+#     echo "called from Linux Mac OS";;	
+#    *)		
+#      echo "Unsupported OS: $OS" >&2;;
+#  esac 
+# 
+. common-hardware-extraction-functions.lib
+. common-auxiliary-functions.lib
+
+function hardwareNodeEnumerator() {
+  manufacturer=$(manufacturerNode)
+  version=$(versionNode)
+  product=$(productNode)
+  serialnumber=$(serialnumberNode)
+  partnumber=$(partnumberNode)
+  bios=$(biosNode)
+  os=$(osNode)
+  processors=$(processorsNode)
+  physicalmemory=$(physicalmemoryNode)
+  physicalmemorydet=$(physicalmemorydetNode)
+  visiblememory=$(visiblememoryNode)
+  displayadapters=$(displayadaptersNode)
+  networkadapters=$(networkadaptersNode)
+  diskdrives=$(diskdrivesNode)
+  cdromdrives=$(cdromdrivesNode)
+  chassis=$(chassisNode)
+  domainrole=$(domainroleNode)
+  generateHardwareXmlRecord
+}
+  
+#---------------------------Hardware Node Functions----------------------------#
+function productNode() {
+  case $OS in
+    Linux)
+    	sudo dmidecode -t 2 | awk -F ": " '(NR == 7){ print $2 }';;
+    Darwin)
+    system_profiler -xml SPHardwareDataType	| awk -F "[<>]" '
+        /platform_product_name/{found=1; next }
+        (found ==1){if ($3 != "") print $3}
+         found = 0;'
+      ;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function osNode() {
+  case $OS in
+    Linux)
+    	uname -osrv
+    	;;
+    Darwin)
+      uname -v
+      ;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function processorsNode() {
+  case $OS in
+    Linux)
+    	cat /proc/cpuinfo|
+        awk -F ": " '/model name/{ print $2}'| head -n 1;;	
+    Darwin)
+      system_profiler -xml SPHardwareDataType	| awk -F "[<>]" '
+        /number_processors/{nfound=1; next }
+        (nfound ==1){if ($3 != "") procNum=$3}nfound = 0;
+        /current_processor_speed/{sfound=1; next }
+        (sfound ==1){if ($3 != "") speed=$3}sfound = 0;
+        /cpu_type/{tfound=1; next }
+        (tfound ==1){if ($3 != "") type=$3}tfound = 0;
+        ($2 == "/dict"){
+          if ( (type !="") ||  (speed !="") || (procNum!="") ){
+            print procNum"x "type" @ "speed; 
+            type="";speed="";procNum="";
+          }
+        }'
+       ;;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function physicalmemorydetNode() {
+  case $OS in
+    Linux)
+    	 sudo dmidecode memory | 
+    	  awk -v "found=0" '
+    	  BEGIN{ OFMT = "%.0f"; mSize=0; dimNum=0; ORS="; "} 
+    	  /Size/{mSize=$2;} 
+    	  /DIMM[0-9]/{ found=NR ;} 
+    	  (found !=0) && (NR == found ){ dimNum=$2 } 
+    	  (found!=0) && (NR == found + 4){ 
+    	    print "["dimNum"] " mSize*1024*1024"/"$2
+    	  }';;
+    Darwin)	  
+      system_profiler -xml SPMemoryDataType |	
+        awk -F "[<>]" '
+        BEGIN{ OFMT = "%.0f"; mSize=0; dimNum=""; ORS="; "}
+        /_name/{ nameFound =1; next } 
+        (nameFound == 1){
+          nameFound = 0; 
+          if ($3 ~ /DIMM/) { 
+            dimNum=$3
+          }
+        }
+        /dimm_size/{ sizeFound=1;next}
+        (sizeFound == 1){ sizeFound=0; mSize=$3;}
+        /dimm_speed/ { speedFound=1;next}
+        (speedFound == 1){ speedFound=0; mSpeed=$3}
+        /dict/ && (dimNum != "") {
+          print "["dimNum"] " mSize*1024*1024"/"mSpeed;
+          dimNum="";mSize=0;mSpeed="";
+        }
+        ';;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+  
+}
+function diskdrivesNode() {
+  drivesInfoXml |  
+    awk -F "[\[\]]" '
+    (value == "Model"){model=$3;} 
+    (value == "Interface Type"){iType=$3;}  
+    (value == "Size"){size=$3} 
+    {value=$3;} 
+    (model != "") && (size != "") {
+      print model" ["size" "iType"];"; model=""; iType=""; size="";
+    }'
+}
+function cdromdrivesNode() {
+  case $OS in
+    Linux)
+  	  sudo cat $hardwareInfo | 
+  	    awk -F ": " '/\*-/{found=0} 
+  	      /\*-cdrom/{found=1} (found == 1) {print $0} ' | 
+  	      awk -F ": " '
+  	      /description/{description=$2} 
+  	      /product/{product=$2}/vendor/{vendor=$2} 
+  	      END{print vendor" "description" "product}';;	
+    Darwin)
+      system_profiler -xml SPDiscBurningDataType | 
+        awk -F "[<>]" '
+        /_name/{ found =1; next } 
+        (found == 1){found = 0; if ($3 != "") { print $3} } ';; 
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function networkadaptersNode() {
+  case $OS in
+    Linux)
+      cat $hardwareInfo | 
+        awk -F ": " '
+        BEGIN{found=0; } 
+        /\*-/{ if (found>0) {
+          print vendor" "product" ["serial"]["ipFour"|"ipSix"];";
+          found = 0;
+        }}  
+        /-network/{found=NR;}
+        (found == 0)  { next;}
+        /vendor/ {vendor=$2} 
+        /product/{product=$2} 
+        /serial:/{
+          serial=$2; 
+          c="sudo ifconfig | grep -i "$2" -A3 |awk '"'"'/inet6/{print $3}'"'"'";
+          c | getline ipSix
+        } 
+        /configuration:/{
+          configs=$2; 
+          cmd="echo "configs" | awk -F '"'[= ]'"' '"'"'{ print $12 }'"'"' "; 
+          cmd | getline ipFour
+        }'
+  	  ;;	
+    Darwin)
+      networkInfoXml |  
+        awk -F "[\[\]]" '
+        BEGIN{ ORS="; "; previous=1;} 
+        (value == "MAC Address") { macAddress=$3; } 
+        (value == "IP Addresses"){ipAddress=$3;}  
+        (value == "Model") { model=$3; } 
+        ( $1 ~ "item"){
+          if ( ( $3*1 > previous*1) && (macAddress != "")) {
+            print model" ["macAddress"]["ipAddress"]";
+            ipAddress="";macAddress="";model="";
+          }
+          previous=$3;      
+        }  
+        {value=$3;}
+        '
+      ;;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+#not found in Linux
+function domainroleNode() {
+  case $OS in
+    *)		
+      echo "$nullMsg"
+    ;;
+  esac
+}

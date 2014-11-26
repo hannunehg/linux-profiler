@@ -1,0 +1,324 @@
+#!/bin/bash
+
+. common-auxiliary-functions.lib
+
+hardwareInfo="._hardware.info"
+# Unused
+OEMMsg="To be filled by O.E.M."
+# Must output empty string so we do not print in xml, so we use this var
+nullMsg=""
+
+systemNodeNumber=1
+osNodeNumber=2
+cpuNodeNumber=3
+drivesNodeNumber=5
+memoryNodesNumber=4
+networkNodesNumber=6
+ 
+# Ubuntu Initialization steps: store lshw output in file for later access
+function Init() {
+  case $OS in
+    Linux)
+    	sudo lshw > $hardwareInfo;;
+    Darwin)
+    	;;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+if [[ -z  $DEVELOPER  ]]
+then
+  Init
+fi
+#-------------------------------Common Functions-------------------------------#
+function manufacturerNode() {
+  case $OS in
+    Linux)
+    	sudo dmidecode -t 2 | awk -F ": " '(NR == 6){ print $2 }';;
+    Darwin)
+       #TODO it seems we can't get motherboard info from system profiler. investigate more
+       ;;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+# Motherboard version
+function versionNode() {
+  case $OS in
+    Linux)		
+      sudo dmidecode -t 2 | awk -F ": " '/Version/{ print $2 }';;
+    Darwin)
+       #TODO it seems we can't get motherboard info from system profiler. investigate more
+       ;;
+     *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function partnumberNode() {
+  case $OS in
+    *)		
+      echo "$nullMsg"
+    ;;
+  esac
+}
+function serialnumberNode() {
+  case $OS in
+    Linux)
+    	sudo dmidecode -t 2 | awk -F ": " '(NR == 9){ print $2 }';;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function biosNode() {
+  case $OS in
+    Linux)
+    	sudo dmidecode -t 0 |
+        awk -F ": " '(NR == 7){ print $2 }' | tr -d ' ';;  	
+    Darwin)
+      system_profiler -xml SPHardwareDataType	| awk -F "[<>]" '
+        /boot_rom_version/{found=1; next }
+        (found ==1){ found = 0; if ($3 != "") { print $3} } 
+        ';; 
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function displayadaptersNode() {
+  case $OS in
+    Linux)
+    	 sudo lspci | awk -F ": " 'BEGIN{ORS="; "}/VGA/{ print $2}';;	
+    Darwin)
+      system_profiler -xml SPDisplaysDataType	| awk -F "[<>]" '
+        BEGIN{ORS="; "; level=0}
+        />_name/{found=1; next }
+        (found ==1){if (($3 != "") && (level == 2)){ print $3} } 
+        ($2 == "dict"){ level++;}
+        ($2 == "/dict"){ level--; }
+        found = 0; ';; 
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function chassisNode() {
+  case $OS in
+    Linux)
+    	 chasisTypes "$(sudo dmidecode -t 3 | awk -F ": " '/Type:/{print $2}')";;	
+    Darwin)
+       #TODO it seems we can't get chassis info from system profiler. investigate more
+       ;;	 
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function physicalmemoryNode() {
+  case $OS in
+    Linux)
+    	 sudo dmidecode memory | 
+    	 awk -v "found=0" '
+    	 BEGIN{ OFMT = "%.0f"; mSize=0; totalSize=0} 
+    	 /Size/{mSize=$2*1024*1024;} 
+    	 /DIMM[0-9]/{ found=NR ; totalSize+=mSize} 
+    	 END{print totalSize}'
+      ;;
+    Darwin)
+      system_profiler -xml SPMemoryDataType	| awk -F "[<>]" '
+        /dimm_size/{found=1; next }
+        (found ==1) && ($2 == "string"){ 
+          if ( ($3 != "") && ($3 != "empty")) { size = size + $3};  
+          split($3, a, " ");
+        }
+        found = 0; 
+        END { print size" "a[2]} 
+        ';;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac 
+}
+function visiblememoryNode() {
+  case $OS in
+    Linux)
+    	 free | awk 'BEGIN{ OFMT = "%.0f"; }/Mem/{print $2*1024}';;	
+    Darwin)
+    system_profiler -xml SPHardwareDataType	| awk -F "[<>]" '
+        /physical_memory/{found=1; next }
+        (found ==1){if ($3 != "") print $3}
+        found = 0; ';;
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function networkInfoXml() {
+  case $OS in
+    Linux)
+      awkScriptMaker ubuntuNetworkNodesEnumerator 
+  	  ;;
+  	Darwin)
+  	  awkScriptMaker macNetworkNodesEnumerator
+   	  ;;	
+    *)		
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function macNetworkNodesEnumerator() {
+  echo "node=$networkNodesNumber"
+  system_profiler -xml SPNetworkDataType | awk -f common-awk-functions.awk -f macGenericXml.awk
+  
+}
+function ubuntuNetworkNodesEnumerator() {
+
+  dhcpFile="dhcp_file_notfound"
+  if [ -f "/var/lib/dhcp3/dhclient.leases" ] 
+  then
+     dhcpFile="/var/lib/dhcp3/dhclient.leases"
+  fi
+  if [ -f "/var/lib/dhcp/dhclient.leases" ]
+  then
+     dhcpFile="/var/lib/dhcp/dhclient.leases"
+  fi
+
+  echo "node=$networkNodesNumber"
+
+  cat $hardwareInfo | 
+    awk -F ": " -vdhcpFile="$dhcpFile" '
+    BEGIN{found=0; interfaceNum=10} 
+    /\*-/{ if (found>0) {
+      
+      gateway="`ip -4 route list dev "logicalName" exact 0/0 | awk '"'"'{print $3}'"'"'`";
+      dnsDomain="`uname -n`.`cat \""dhcpFile"\" | awk -F\"[ ;]\" -vname="logicalName" '"'"'/interface/{found=0; if ( $0 ~ name) { found=1}} (found ==1) &&/domain-name /{dnsIp=$5}END{print dnsIp}'"'"' | xargs echo`";
+      dns="`nm-tool | awk -vname="logicalName" '"'"'BEGIN{ORS=\"|\";}/Device/{found=0; if ( $0 ~ name){ found=1} } (found ==1) && /DNS:/{print $2}'"'"'`";
+      dhcp="`cat \""dhcpFile"\" | awk -F\"[ ;]\" -vname="logicalName" '"'"'/interface/{found=0; if ( $0 ~ name) { found=1}} (found ==1) &&/dhcp-server-identifier/{dhcpIp=$5}END{print dhcpIp}'"'"'`";
+      
+      
+      print "item=\""interfaceNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"MAC Address\" value=\""serial"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"IP Addresses\" value=\""ipFour"|"ipSix"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"Default Gateway\" value=\""gateway"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"DNS Domain\" value=\""dnsDomain"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"DHCP Server\" value=\""dhcp"\" generateHwInventoryXmlRecord; ";
+      print "item=\""interfaceNum"\" attribute=\"DNS Servers\" value=\""dns"\" generateHwInventoryXmlRecord; ";
+      
+      found = 0;
+      vendor=""; product=""; ipFour=""; ipSix=""; serial="";
+      interfaceNum++;
+    }}  
+    /-network/{found=NR;}
+    (found == 0)  { next;}
+    /vendor/ {vendor=$2} 
+    /logical name:/{logicalName=$2}
+    /product/{product=$2} 
+    /serial:/{
+    serial=$2; cmd1="sudo ifconfig | grep -i "$2" -A3 | awk '"'"' /inet6/{split($3,params, \"/\"); print params[1]}'"'"'";cmd1 | getline ipSix} 
+    /configuration:/{
+    configs=$2; cmd="echo " configs " | awk -F '"'[= ]'"' '"'"'{ print $12 }'"'"' "; cmd | getline ipFour
+    }'
+    
+}
+function drivesInfoXml() {
+  node=$drivesNodeNumber
+  case $OS in
+    Linux)
+      awkScriptMaker ubuntuDrivesNodeEnumerator
+    ;;
+    Darwin)
+      awkScriptMaker darwinDrivesNodeEnumerator
+    ;;
+    *)	
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function darwinDrivesNodeEnumerator() {
+  echo "node=$drivesNodeNumber"
+  system_profiler -xml SPSerialATADataType |  
+  awk -f common-awk-functions.awk -f macGenericXml.awk
+}
+function ubuntuDrivesNodeEnumerator() {
+  echo "node=$drivesNodeNumber"
+
+  cat $hardwareInfo | 
+  awk -F ": " '
+  BEGIN{
+  nodesFound=0;
+
+  nodeType=0;
+  found=0;
+  iType="SCSI";
+
+  }
+  function printCdRomInfo() {
+    print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; "; 
+    vendor=""; product="";
+    diskNum++;
+  }
+  function printDiskInfo() {
+    print "item=\""diskNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
+    print "item=\""diskNum"\" attribute=\"Interface Type\" value=\""iType"\" generateHwInventoryXmlRecord; ";
+    print "item=\""diskNum"\" attribute=\"Size\" value=\""size"\" generateHwInventoryXmlRecord; ";
+    vendor=""; product="";size="";
+    diskNum++;
+  }
+  function printOtherInfo() { 
+    freeSpace="`sudo df -k -P "name" | awk '"'"'NR==2{print $4/(1024*1024)}'"'"'`";
+    size="`sudo df -k -P "name" | awk '"'"'NR==2{print $2/(1024*1024)}'"'"'`";
+    
+    print "item=\""name"\" attribute=\"Partition Size (Gib)\" value=\""size"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Free Space (Gib)\" value=\""freeSpace"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Volume Name\" value=\""logicalName"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"Volume Serial Number\" value=\""serial"\" generateHwInventoryXmlRecord; ";
+    print "item=\""name"\" attribute=\"File System\" value=\""description"\" generateHwInventoryXmlRecord; ";
+    
+    size = ""; freeSpace="";capacity= "";
+    name="";serial="";description="";
+    diskNum++;
+  }
+  
+  function printPrevious() {
+    if (nodesFound > 0) {
+      #debug
+      #print "type: "nodeType".Prev name: "name" "$0;
+      if (nodeType == 0) {
+        printOtherInfo();
+      }
+      if (nodeType == 1) {
+        printCdRomInfo();
+      } 
+      if (nodeType == 2) {
+        printDiskInfo();
+      }
+      name="";
+    }
+  }
+
+  #### MAIN FLOW BELOW ####
+  /\*-scsi/{ found=index($0, "-");nodeType=-1;next;}
+  
+  (found == 0){ next; }
+  
+  /\*-/{
+    current=index($0, "-");
+    if ( current <= found) {
+      found = 0;
+    }
+    printPrevious();
+    
+    nodeType=0; 
+    if ( $0 ~ "cdrom"){ nodeType=1;}
+    if ( $0 ~ "disk"){ nodeType=2;}
+    if ( $0 ~ "scsi"){nodeType=-1;}
+    
+    
+    name="";
+    nodesFound++;
+    next;
+  }
+  /description:/{description=$2} 
+  /product:/{product=$2}
+  /vendor:/{vendor=$2} 
+  /bus info:/{bus=$2} 
+  /logical name:/{ if (name == "") {name=$2 } logicalName=$2;}
+  /serial:/{serial=$2} 
+  /size:/{size=$2} 
+  /capacity:/{capacity=$2}
+  '
+}
+
+

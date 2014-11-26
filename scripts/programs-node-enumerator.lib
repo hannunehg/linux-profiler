@@ -1,0 +1,93 @@
+#!/bin/bash
+# this file's output is a script.
+
+thisScriptName=$(basename ${BASH_SOURCE[0]})
+. common-auxiliary-functions.lib
+
+function programsNodeEnumerator() {
+  case $OS in
+    Linux)
+      awkScriptMaker ubuntuProgramsNodeEnumerator
+    ;;
+    Darwin)
+      awkScriptMaker darwinProgramsNodeEnumerator
+    ;;
+    *)	
+      echo "Unsupported OS: $OS" >&2;;
+  esac
+}
+function ubuntuProgramsNodeEnumerator() {
+  dpkg-query -l | 
+    awk -F "[: ]" '/ii/{print $3}' | 
+      xargs dpkg-query --print-avail | 
+    awk -F ": " '
+    function printXmlCmd() {
+      print "displayname=\""displayname"\";"
+      print "displayversion=\""displayversion"\";"
+      print "publisher=\""publisher"\"; "
+      print "urlinfoabout=\""urlinfoabout"\"; "
+      print "comments=\""comments"\"; generateProgramsXmlRecord"
+    }
+    /Package/{displayname=$2} 
+    /Version:/{displayversion=$2} 
+    /Maintainer:/{publisher=$2} 
+    /Homepage:/{urlinfoabout=$2} 
+    /Description:/{comments="$2"} 
+    /^$/ {
+      printXmlCmd()
+    } 
+    END {
+      printXmlCmd()
+    }'
+}
+function darwinProgramsNodeEnumerator() {
+  system_profiler -xml SPApplicationsDataType | awk -F "[><]" '
+    BEGIN {
+    first=1;
+    }
+    function printXmlCmd() {
+      print "displayname=\""displayname"\";"
+      print "displayversion=\""displayversion"\";"
+      print "publisher=\""publisher"\"; "
+      print "comments=\""comments"\"; "
+      print "installdate=\""installdate"\"; "
+      print "installlocation=\""installlocation"\"; "
+      print "urlinfoabout=\""urlinfoabout"\"; "
+      print "contact=\""contact"\"; "
+      print "generateProgramsXmlRecord;"
+      displayname=""; displayversion=""; publisher="";urlinfoabout="";
+      comments=""; contact=""; installdate=""; installlocation="";
+    }
+    ($2 ~ "key"){ key=$3;}
+    
+    ($2 ~ "string") || ($2 ~ "date"){
+      if (key == "_name"){ 
+        if (first==1){ first = 0; displayname=$3} 
+        else { printXmlCmd();  displayname=$3; }
+      }
+      if (key == "version") { displayversion=$3;}
+      if (key == "obtained_from") { publisher=$3; }
+      if (key == "info") { comments=$3;}
+      if (key == "lastModified") { installdate=$3;}
+      if (key == "path") { installlocation=$3;}       
+    }
+    END{
+      printXmlCmd(); 
+    }
+    '
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
