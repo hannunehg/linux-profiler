@@ -7,7 +7,13 @@ thisScriptName=$(basename ${BASH_SOURCE[0]})
 function programsNodeEnumerator() {
   case $OS in
     Linux)
-      awkScriptMaker ubuntuProgramsNodeEnumerator
+	  if [ `command -v dpkg-query | grep -c -i dpkg-query` -eq 1 ]; then
+		awkScriptMaker ubuntuProgramsNodeEnumerator
+	  else
+		  if [ `command -v rpm | grep -c -i rpm` -eq 1 ]; then
+			awkScriptMaker centosProgramsNodeEnumerator		
+		  fi
+	  fi
     ;;
     Darwin)
       awkScriptMaker darwinProgramsNodeEnumerator
@@ -25,13 +31,37 @@ function ubuntuProgramsNodeEnumerator() {
       print "displayname=\""displayname"\";"
       print "displayversion=\""displayversion"\";"
       print "publisher=\""publisher"\"; "
-      print "urlinfoabout=\""urlinfoabout"\"; "
+      print "urlinfoabout=\"`echo "urlinfoabout" | sed \"s/&/and/g\"` \"; "
       print "comments=\""comments"\"; generateProgramsXmlRecord"
     }
-    /Package/{displayname=$2} 
+    /Package:/{displayname=$2} 
     /Version:/{displayversion=$2} 
     /Maintainer:/{publisher=$2} 
     /Homepage:/{urlinfoabout=$2} 
+    /Description:/{comments="$2"} 
+    /^$/ {
+      printXmlCmd()
+    } 
+    END {
+      printXmlCmd()
+    }'
+}
+
+function centosProgramsNodeEnumerator() {
+  rpm -qa | 
+       xargs rpm -qi | 
+    awk -F ": " '
+    function printXmlCmd() {
+      print "displayname=\""displayname"\";"
+      print "displayversion=\""displayversion"\";"
+      print "publisher=\""publisher"\"; "
+      print "urlinfoabout=\""urlinfoabout"\"; "
+      print "comments=\""comments"\"; generateProgramsXmlRecord"
+    }
+    /Name/{displayname=$2} 
+    /Version/{displayversion=$2} 
+    /Vendor/{publisher=$2} 
+    /URL/{urlinfoabout=$2} 
     /Description:/{comments="$2"} 
     /^$/ {
       printXmlCmd()

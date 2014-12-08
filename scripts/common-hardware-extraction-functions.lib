@@ -23,7 +23,7 @@ function Init() {
     Darwin)
     	;;
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac
 }
 if [[ -z  $DEVELOPER  ]]
@@ -39,7 +39,7 @@ function manufacturerNode() {
        #TODO it seems we can't get motherboard info from system profiler. investigate more
        ;;
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac 
 }
 # Motherboard version
@@ -51,7 +51,7 @@ function versionNode() {
        #TODO it seems we can't get motherboard info from system profiler. investigate more
        ;;
      *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac
 }
 function partnumberNode() {
@@ -65,8 +65,10 @@ function serialnumberNode() {
   case $OS in
     Linux)
     	sudo dmidecode -t 2 | awk -F ": " '(NR == 9){ print $2 }';;
+    Darwin)
+     ;;	
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac 
 }
 function biosNode() {
@@ -80,7 +82,7 @@ function biosNode() {
         (found ==1){ found = 0; if ($3 != "") { print $3} } 
         ';; 
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac 
 }
 function displayadaptersNode() {
@@ -96,7 +98,7 @@ function displayadaptersNode() {
         ($2 == "/dict"){ level--; }
         found = 0; ';; 
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac
 }
 function chassisNode() {
@@ -107,45 +109,116 @@ function chassisNode() {
        #TODO it seems we can't get chassis info from system profiler. investigate more
        ;;	 
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac
 }
-function physicalmemoryNode() {
-  case $OS in
+function physicalmemoryAwk() {
+case $OS in
     Linux)
     	 sudo dmidecode memory | 
     	 awk -v "found=0" '
-    	 BEGIN{ OFMT = "%.0f"; mSize=0; totalSize=0} 
-    	 /Size/{mSize=$2*1024*1024;} 
-    	 /DIMM[0-9]/{ found=NR ; totalSize+=mSize} 
+    	 BEGIN{ OFMT = "%.0f"; size=0; totalSize=0} 
+    	 /Size/{
+    	 
+          if($NF ~ "^G" )
+          {
+           size = size + ($2 * 1024 * 1024 * 1024)
+          }
+          if($NF ~ "^M" )
+          {
+          size = size + ($2 * 1024 * 1024)
+          }
+          if($NF ~ "^K" && $NF ~ "^k"   )
+          {
+          size = size + ($2 * 1024)
+          }
+          if($NF ~ "^B" )
+          {
+          size = size + ($2)
+          }
+    	 } 
+    	 /DIMM[0-9]/{ found=NR ; totalSize+=size; size=0} 
     	 END{print totalSize}'
       ;;
     Darwin)
       system_profiler -xml SPMemoryDataType	| awk -F "[<>]" '
+        BEGIN{ OFMT = "%.0f"; }
         /dimm_size/{found=1; next }
         (found ==1) && ($2 == "string"){ 
-          if ( ($3 != "") && ($3 != "empty")) { size = size + $3};  
+
           split($3, a, " ");
+            if ( (a[2] != "") && (a[2] != "empty"))
+            {
+                if(a[2] ~ "^G" )
+                {
+                 size = size + (a[1] * 1024 * 1024 * 1024)
+                }
+                if(a[2] ~ "^M" )
+                {
+                size = size + (a[1] * 1024 * 1024)
+                }
+                if(a[2] ~ "^K" )
+                {
+                size = size + (a[1] * 1024)
+                }
+                if(a[2] ~ "^B" )
+                {
+                size = size + (a[1])
+                }
+            };
         }
-        found = 0; 
-        END { print size" "a[2]} 
+        found = 0;
+        END { print size}
         ';;	
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac 
 }
-function visiblememoryNode() {
+function physicalmemoryNode() {
+memory=
+echo memory: $memory
+  if [[ $memory != "" && $(( $memory + 0 )) > 0 ]]
+  then
+    echo $memory
+  else
+    visiblememoryAwk
+  fi 
+}
+function visiblememoryAwk() {
   case $OS in
     Linux)
     	 free | awk 'BEGIN{ OFMT = "%.0f"; }/Mem/{print $2*1024}';;	
     Darwin)
     system_profiler -xml SPHardwareDataType	| awk -F "[<>]" '
         /physical_memory/{found=1; next }
-        (found ==1){if ($3 != "") print $3}
+(found ==1){split($3, a, " ");
+if ( (a[2] != "") && (a[2] != "empty"))
+{
+if(a[2] ~ "^G" )
+{
+size = size + (a[1] * 1024 * 1024 * 1024)
+}
+if(a[2] ~ "^M" )
+{
+size = size + (a[1] * 1024 * 1024)
+}
+if(a[2] ~ "^K" )
+{
+size = size + (a[1] * 1024)
+}
+if(a[2] ~ "^B" )
+{
+size = size + (a[1])
+}
+print size;}
+}
         found = 0; ';;
-    *)		
-      echo "Unsupported OS: $OS" >&2;;
+    *)
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac
+}
+function visiblememoryNode() {
+  visiblememoryAwk
 }
 function networkInfoXml() {
   case $OS in
@@ -156,7 +229,7 @@ function networkInfoXml() {
   	  awkScriptMaker macNetworkNodesEnumerator
    	  ;;	
     *)		
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac
 }
 function macNetworkNodesEnumerator() {
@@ -189,13 +262,13 @@ function ubuntuNetworkNodesEnumerator() {
       dhcp="`cat \""dhcpFile"\" | awk -F\"[ ;]\" -vname="logicalName" '"'"'/interface/{found=0; if ( $0 ~ name) { found=1}} (found ==1) &&/dhcp-server-identifier/{dhcpIp=$5}END{print dhcpIp}'"'"'`";
       
       
-      print "item=\""interfaceNum"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
-      print "item=\""interfaceNum"\" attribute=\"MAC Address\" value=\""serial"\" generateHwInventoryXmlRecord; ";
-      print "item=\""interfaceNum"\" attribute=\"IP Addresses\" value=\""ipFour"|"ipSix"\" generateHwInventoryXmlRecord; ";
-      print "item=\""interfaceNum"\" attribute=\"Default Gateway\" value=\""gateway"\" generateHwInventoryXmlRecord; ";
-      print "item=\""interfaceNum"\" attribute=\"DNS Domain\" value=\""dnsDomain"\" generateHwInventoryXmlRecord; ";
-      print "item=\""interfaceNum"\" attribute=\"DHCP Server\" value=\""dhcp"\" generateHwInventoryXmlRecord; ";
-      print "item=\""interfaceNum"\" attribute=\"DNS Servers\" value=\""dns"\" generateHwInventoryXmlRecord; ";
+      print "item=\""logicalName"\" attribute=\"Model\" value=\""vendor" "product"\" generateHwInventoryXmlRecord; ";
+      print "item=\""logicalName"\" attribute=\"MAC Address\" value=\""serial"\" generateHwInventoryXmlRecord; ";
+      print "item=\""logicalName"\" attribute=\"IP Addresses\" value=\""ipFour"|"ipSix"\" generateHwInventoryXmlRecord; ";
+      print "item=\""logicalName"\" attribute=\"Default Gateway\" value=\""gateway"\" generateHwInventoryXmlRecord; ";
+      print "item=\""logicalName"\" attribute=\"DNS Domain\" value=\""dnsDomain"\" generateHwInventoryXmlRecord; ";
+      print "item=\""logicalName"\" attribute=\"DHCP Server\" value=\""dhcp"\" generateHwInventoryXmlRecord; ";
+      print "item=\""logicalName"\" attribute=\"DNS Servers\" value=\""dns"\" generateHwInventoryXmlRecord; ";
       
       found = 0;
       vendor=""; product=""; ipFour=""; ipSix=""; serial="";
@@ -223,7 +296,7 @@ function drivesInfoXml() {
       awkScriptMaker darwinDrivesNodeEnumerator
     ;;
     *)	
-      echo "Unsupported OS: $OS" >&2;;
+      echo "$FUNCNAME: Unsupported OS: $OS" >&2;;
   esac
 }
 function darwinDrivesNodeEnumerator() {

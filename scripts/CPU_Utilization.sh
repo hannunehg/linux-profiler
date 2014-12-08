@@ -7,7 +7,7 @@
 OS=`uname`
 case $OS in
   Linux)   NVAL=$(vmstat -n 1 2 | tail -1 | awk '{print 100-$(NF-1)}');;
-  Darwin)  NVAL=$(iostat -c 2 -w 1 | tail -1 | awk '{print 100-$6}');;  
+  Darwin)  NVAL=$(iostat -c 1 -w 1 | tail -1 | awk '{print 100-$6}');;  
   FreeBSD) NVAL=$(vmstat -c 2 -w 1 | tail -1 | awk '{print 100-$NF}');;
   NetBSD)  NVAL=$(vmstat -c 2 -w 1 | tail -1 | awk '{print 100-$NF}');;
   OpenBSD) NVAL=$(vmstat -c 2 -w 1 | tail -1 | awk '{print 100-$NF}');;

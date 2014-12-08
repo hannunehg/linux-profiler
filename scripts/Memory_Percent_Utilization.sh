@@ -1,9 +1,7 @@
 #!/bin/sh
 # --------------------------------------
 # Memory Percent Utilization
-# -----------------------------------
-# Copyright (c) 2014, Servoyant, LLC
-# ----------------------------------- 
+
 OS=`uname`
 case $OS in
   Linux)   NVAL=$(free | grep Mem | awk '{print (100*$3)/$2}');;

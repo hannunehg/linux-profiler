@@ -4,7 +4,7 @@
 # -----------------------------------
 # Copyright (c) 2014, Servoyant, LLC
 # -----------------------------------
-ARGC=$#
+ARGC=#$
 if [ $ARGC -eq 0 ]; then
 	echo "UNK::0::Missing parameter"
 	exit
